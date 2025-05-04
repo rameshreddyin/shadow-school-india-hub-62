@@ -32,6 +32,11 @@ const Sidebar: React.FC = () => {
       label: 'Classes',
       path: '/classes'
     },
+    {
+      icon: Columns,
+      label: 'Class & Section Manager',
+      path: '/class-section-manager'
+    },
     { 
       icon: CalendarCheck, 
       label: 'Attendance', 

@@ -17,6 +17,7 @@ import ReportsPage from "./pages/ReportsPage";
 import NoticesPage from "./pages/NoticesPage";
 import SettingsPage from "./pages/SettingsPage";
 import ClassesPage from "./pages/ClassesPage";
+import ClassSectionManagerPage from "./pages/ClassSectionManagerPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/notices" element={<NoticesPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/classes" element={<ClassesPage />} />
+            <Route path="/class-section-manager" element={<ClassSectionManagerPage />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -123,9 +123,11 @@ const TimetableManager: React.FC = () => {
   };
   
   const handleSavePeriod = (periodData: Period) => {
-    if (!currentTimetable || !editingCell) return;
+    if (!currentTimetable) return;
     
-    const { day, slot } = editingCell;
+    // If editingCell is null (adding a new period), use the values from periodData
+    const day = editingCell ? editingCell.day : periodData.timeSlot.id;
+    const slot = editingCell ? editingCell.slot : periodData.timeSlot.id;
     
     // Check for teacher conflicts
     const hasConflict = Object.entries(currentTimetable.days).some(([currentDay, dayData]) => {
@@ -149,6 +151,11 @@ const TimetableManager: React.FC = () => {
         variant: "destructive"
       });
       return;
+    }
+    
+    // Make sure the day structure exists
+    if (!currentTimetable.days[day]) {
+      currentTimetable.days[day] = { slots: {} };
     }
     
     const updatedTimetable = {

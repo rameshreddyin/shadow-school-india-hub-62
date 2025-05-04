@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Plus, User, Edit, Eye, Trash2 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
@@ -32,6 +31,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import AddStudentDialog from '@/components/students/AddStudentDialog';
 
 // Mock student data
 const students = [
@@ -130,10 +130,7 @@ const StudentsPage: React.FC = () => {
         {/* Page Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Student List</h1>
-          <Button className="flex items-center gap-2 self-start sm:self-auto">
-            <Plus className="h-4 w-4" />
-            <span>Add Student</span>
-          </Button>
+          <AddStudentDialog />
         </div>
 
         {/* Filters and Search */}

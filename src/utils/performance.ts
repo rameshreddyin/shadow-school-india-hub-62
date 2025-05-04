@@ -1,4 +1,6 @@
 
+import React, { useEffect } from 'react';
+
 /**
  * Performance monitoring utilities for the application
  */
@@ -85,7 +87,7 @@ export const withPerformanceMonitoring = <P extends object>(
     const startTime = Date.now();
     
     // Use an effect to record render time
-    React.useEffect(() => {
+    useEffect(() => {
       recordComponentRender(componentName, startTime);
     }, []);
     

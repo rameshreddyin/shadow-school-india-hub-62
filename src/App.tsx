@@ -16,6 +16,7 @@ import FeesPage from "./pages/FeesPage";
 import ReportsPage from "./pages/ReportsPage";
 import NoticesPage from "./pages/NoticesPage";
 import SettingsPage from "./pages/SettingsPage";
+import AcademicYearSettingsPage from "./pages/AcademicYearSettingsPage";
 import ClassSectionManagerPage from "./pages/ClassSectionManagerPage";
 import CourseSubjectManagerPage from "./pages/CourseSubjectManagerPage";
 import NotFound from "./pages/NotFound";
@@ -40,9 +41,9 @@ const App = () => (
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/notices" element={<NoticesPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/academic-year-settings" element={<AcademicYearSettingsPage />} />
             <Route path="/class-section-manager" element={<ClassSectionManagerPage />} />
             <Route path="/course-subject-manager" element={<CourseSubjectManagerPage />} />
-            <Route path="/academic-year-settings" element={<Navigate to="/settings" replace />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

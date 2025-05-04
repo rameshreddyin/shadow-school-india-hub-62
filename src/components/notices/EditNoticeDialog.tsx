@@ -77,6 +77,7 @@ const EditNoticeDialog: React.FC<EditNoticeDialogProps> = ({
   function onSubmit(data: NoticeFormValues) {
     onSave({
       ...data,
+      id: data.id, // Ensure id is explicitly included
       visibleFrom: data.visibleFrom.toISOString(),
       visibleUntil: data.visibleUntil.toISOString(),
     });

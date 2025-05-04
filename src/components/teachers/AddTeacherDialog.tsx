@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Dialog,
@@ -36,11 +37,11 @@ const AddTeacherDialog: React.FC<AddTeacherDialogProps> = ({ trigger }) => {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Teacher</DialogTitle>
           <DialogDescription>
-            Fill in the teacher details. Fields marked with * are required.
+            Fill in the teacher details and click save when you're done.
           </DialogDescription>
         </DialogHeader>
         <AddTeacherForm onSuccess={handleSuccess} onAddAnother={handleAddAnother} />

@@ -24,12 +24,14 @@ interface AddPaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   student: any | null;
+  currentTerm: string; // Added currentTerm prop
 }
 
 const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
   isOpen,
   onClose,
-  student
+  student,
+  currentTerm // Added currentTerm to the component
 }) => {
   const [term, setTerm] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
@@ -45,8 +47,11 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
       setPaymentMode("");
       setNotes("");
       setFile(null);
+    } else if (student && student.paymentMode === 'term-wise') {
+      // Default to current term for term-wise payment students
+      setTerm(currentTerm.toLowerCase().replace(' ', ''));
     }
-  }, [isOpen, student]);
+  }, [isOpen, student, currentTerm]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

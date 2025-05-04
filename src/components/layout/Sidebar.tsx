@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useSidebar } from './SidebarProvider';
 import { 
   LayoutDashboard, Users, User, CalendarCheck, 
-  Calendar, FileText, Bell, Settings, X, Columns 
+  Calendar, FileText, Bell, Settings, X, Columns, Book 
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -29,13 +29,13 @@ const Sidebar: React.FC = () => {
     },
     {
       icon: Columns,
-      label: 'Classes',
-      path: '/classes'
-    },
-    {
-      icon: Columns,
       label: 'Class & Section Manager',
       path: '/class-section-manager'
+    },
+    {
+      icon: Book,
+      label: 'Course & Subject Manager',
+      path: '/course-subject-manager'
     },
     { 
       icon: CalendarCheck, 

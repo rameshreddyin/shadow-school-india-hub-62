@@ -3,14 +3,8 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StaffAttendanceTab from './StaffAttendanceTab';
 import StaffAttendanceHistory from './StaffAttendanceHistory';
+import StudentAttendanceTab from './StudentAttendanceTab';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Placeholder for StudentAttendanceTab - would be implemented similarly
-const StudentAttendanceTab = () => (
-  <div className="p-6 flex items-center justify-center h-64">
-    <p className="text-muted-foreground">Student Attendance Tab (Existing Functionality)</p>
-  </div>
-);
 
 const AttendanceTabs: React.FC = () => {
   const [staffTab, setStaffTab] = useState<"attendance" | "history">("attendance");
@@ -23,7 +17,19 @@ const AttendanceTabs: React.FC = () => {
       </TabsList>
       
       <TabsContent value="students">
-        <StudentAttendanceTab />
+        <Card>
+          <CardHeader>
+            <CardTitle>Student Attendance</CardTitle>
+            <CardDescription>
+              Manage daily attendance for all students
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="p-6">
+              <StudentAttendanceTab />
+            </div>
+          </CardContent>
+        </Card>
       </TabsContent>
       
       <TabsContent value="staff">

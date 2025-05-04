@@ -1,15 +1,21 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSidebar } from './SidebarProvider';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { 
   LayoutDashboard, Users, User, CalendarCheck, 
-  Calendar, FileText, Bell, Settings, X, Columns, Book 
+  Calendar, FileText, Bell, Settings, X, Columns, Book,
+  LogOut
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
   const { isOpen, close } = useSidebar();
   const location = useLocation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
   const menuItems = [
     { 
@@ -68,6 +74,15 @@ const Sidebar: React.FC = () => {
       path: '/settings' 
     }
   ];
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
+    navigate('/login');
+  };
 
   return (
     <>
@@ -132,16 +147,27 @@ const Sidebar: React.FC = () => {
         
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-sidebar-border">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                <span className="text-xs font-medium">AD</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-xs font-medium">{user?.name?.substring(0, 2) || 'AD'}</span>
+                </div>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium">{user?.name || 'Admin User'}</p>
+                <p className="text-xs text-sidebar-foreground/70">{user?.email || 'admin@school.com'}</p>
               </div>
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium">Admin User</p>
-              <p className="text-xs text-sidebar-foreground/70">admin@school.com</p>
-            </div>
+            
+            <button 
+              onClick={handleLogout}
+              className="p-2 rounded-full text-sidebar-foreground hover:bg-sidebar-accent/50"
+              aria-label="Logout"
+              title="Logout"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
         </div>
       </aside>

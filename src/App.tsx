@@ -35,7 +35,6 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: import.meta.env.PROD,
       staleTime: 5 * 60 * 1000, // 5 minutes
-      suspense: false, // Using suspense for data fetching is optional
     },
     mutations: {
       // No specific mutation options needed

@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { 
-  Calendar,
-  CalendarIcon,
+  Calendar as CalendarIcon,
   PlusCircle,
   Pencil,
   Trash2,
@@ -53,7 +52,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { DatePicker } from '@/components/ui/calendar';
+import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import {
   Alert,
@@ -248,7 +247,7 @@ const AcademicYearSettings: React.FC = () => {
         <Card>
           <CardContent className="py-10">
             <div className="flex flex-col items-center justify-center text-center">
-              <Calendar className="h-10 w-10 text-muted-foreground mb-2" />
+              <CalendarIcon className="h-10 w-10 text-muted-foreground mb-2" />
               <h3 className="text-lg font-medium">No Academic Years</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 You haven't added any academic years yet.
@@ -383,11 +382,12 @@ const AcademicYearSettings: React.FC = () => {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <DatePicker
+                      <Calendar
                         mode="single"
                         selected={formData.startDate}
                         onSelect={(date) => date && handleChange('startDate', date)}
                         initialFocus
+                        className={cn("p-3 pointer-events-auto")}
                       />
                     </PopoverContent>
                   </Popover>
@@ -413,12 +413,13 @@ const AcademicYearSettings: React.FC = () => {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <DatePicker
+                      <Calendar
                         mode="single"
                         selected={formData.endDate}
                         onSelect={(date) => date && handleChange('endDate', date)}
                         fromDate={formData.startDate}
                         initialFocus
+                        className={cn("p-3 pointer-events-auto")}
                       />
                     </PopoverContent>
                   </Popover>

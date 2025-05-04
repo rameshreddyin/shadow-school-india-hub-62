@@ -1,16 +1,10 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { getToken, setToken, removeToken, isTokenValid, setUserData, getUserData } from '@/utils/jwt';
+import { toast } from 'sonner';
 
-interface AuthContextType {
-  isAuthenticated: boolean;
-  loading: boolean;
-  user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-}
-
-interface User {
+export interface AuthUser {
   id: string;
   name: string;
   email: string;
@@ -18,119 +12,134 @@ interface User {
   avatar?: string;
 }
 
+interface AuthContextType {
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+}
+
 const AuthContext = createContext<AuthContextType>({
+  user: null,
   isAuthenticated: false,
   loading: true,
-  user: null,
   login: async () => false,
   logout: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [user, setUser] = useState<User | null>(null);
-  const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Check if user is already authenticated on mount
+  // Check authentication status on mount and route change
   useEffect(() => {
-    const checkAuth = () => {
-      const userStr = localStorage.getItem('vidya_user');
-      const userSession = localStorage.getItem('vidya_session');
+    const checkAuth = async () => {
+      setLoading(true);
       
-      if (userStr && userSession) {
-        try {
-          const userData = JSON.parse(userStr);
-          setUser(userData);
-          setIsAuthenticated(true);
-        } catch (error) {
-          console.error('Failed to parse user data', error);
-          localStorage.removeItem('vidya_user');
-          localStorage.removeItem('vidya_session');
+      try {
+        // Check if token exists and is valid
+        if (isTokenValid()) {
+          // Get user data from storage
+          const userData = getUserData();
+          if (userData) {
+            setUser(userData);
+          } else {
+            // If no user data but valid token, fetch user data from API
+            // For now, we'll just use a mock user
+            const mockUser = {
+              id: '1',
+              name: 'Admin User',
+              email: 'admin@school.com',
+              role: 'admin'
+            };
+            setUser(mockUser);
+            setUserData(mockUser);
+          }
+        } else {
+          // Token invalid or missing
+          setUser(null);
+          removeToken();
+          
+          // Redirect to login if not already there
+          if (!location.pathname.includes('/login')) {
+            navigate('/login', { replace: true });
+          }
         }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setUser(null);
+        removeToken();
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
-    
+
     checkAuth();
-  }, []);
+  }, [location.pathname, navigate]);
 
-  // Auto refresh auth state every 15 minutes to prevent session expiry issues
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    
-    const interval = setInterval(() => {
-      const sessionExpiry = localStorage.getItem('vidya_session_expiry');
-      
-      if (sessionExpiry) {
-        const expiryTime = parseInt(sessionExpiry, 10);
-        const now = Date.now();
-        
-        if (now > expiryTime) {
-          // Session expired - log user out
-          logout();
-          toast({
-            title: "Session Expired",
-            description: "Your session has expired. Please log in again.",
-            variant: "destructive",
-          });
-        }
-      }
-    }, 15 * 60 * 1000); // Check every 15 minutes
-    
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
-
+  // Mock login function (replace with actual API call)
   const login = async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
     
-    // Simulate API call - in production this would be a real API call
-    // with proper encryption and authentication
     try {
-      // Demo login for testing purposes
+      // Mock API call - replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock successful authentication
       if (email === 'admin@school.com' && password === 'password') {
-        const userData: User = {
-          id: 'admin-1',
+        const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IkFkbWluIFVzZXIiLCJlbWFpbCI6ImFkbWluQHNjaG9vbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3Njc5NjM4MDB9.8MrpH3J8LQ4G5VIq9evsAO_vdho7S5HShDh4RxmcD9Y';
+        const mockUser = {
+          id: '1',
           name: 'Admin User',
           email: 'admin@school.com',
-          role: 'admin',
+          role: 'admin'
         };
         
-        const sessionExpiry = Date.now() + 8 * 60 * 60 * 1000; // 8 hours
+        // Set auth token and user data
+        setToken(mockToken);
+        setUserData(mockUser);
+        setUser(mockUser);
         
-        localStorage.setItem('vidya_user', JSON.stringify(userData));
-        localStorage.setItem('vidya_session', '1');
-        localStorage.setItem('vidya_session_expiry', sessionExpiry.toString());
-        
-        setUser(userData);
-        setIsAuthenticated(true);
-        setLoading(false);
-        
+        toast.success('Login successful');
+        navigate('/dashboard');
         return true;
+      } else {
+        toast.error('Invalid email or password');
+        return false;
       }
-      
-      setLoading(false);
-      return false;
     } catch (error) {
-      console.error('Login failed', error);
-      setLoading(false);
+      console.error('Login error:', error);
+      toast.error('Login failed. Please try again.');
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('vidya_user');
-    localStorage.removeItem('vidya_session');
-    localStorage.removeItem('vidya_session_expiry');
-    setIsAuthenticated(false);
+    removeToken();
     setUser(null);
+    toast.success('Logged out successfully');
+    navigate('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, user, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated: !!user, 
+      loading, 
+      login, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

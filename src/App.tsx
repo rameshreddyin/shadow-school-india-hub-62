@@ -1,4 +1,5 @@
 
+import React, { Suspense, lazy } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,20 +9,24 @@ import { SidebarProvider } from "@/components/layout/SidebarProvider";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
+// Eagerly loaded components
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
-import StudentsPage from "./pages/StudentsPage";
-import TeachersPage from "./pages/TeachersPage";
-import AttendancePage from "./pages/AttendancePage";
-import TimetablePage from "./pages/TimetablePage";
-import FeesPage from "./pages/FeesPage";
-import ReportsPage from "./pages/ReportsPage";
-import NoticesPage from "./pages/NoticesPage";
-import SettingsPage from "./pages/SettingsPage";
-import AcademicYearSettingsPage from "./pages/AcademicYearSettingsPage";
-import ClassSectionManagerPage from "./pages/ClassSectionManagerPage";
-import CourseSubjectManagerPage from "./pages/CourseSubjectManagerPage";
 import NotFound from "./pages/NotFound";
+import LoadingFallback from "./components/LoadingFallback";
+
+// Lazily loaded components
+const StudentsPage = lazy(() => import("./pages/StudentsPage"));
+const TeachersPage = lazy(() => import("./pages/TeachersPage"));
+const AttendancePage = lazy(() => import("./pages/AttendancePage"));
+const TimetablePage = lazy(() => import("./pages/TimetablePage"));
+const FeesPage = lazy(() => import("./pages/FeesPage"));
+const ReportsPage = lazy(() => import("./pages/ReportsPage"));
+const NoticesPage = lazy(() => import("./pages/NoticesPage"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const AcademicYearSettingsPage = lazy(() => import("./pages/AcademicYearSettingsPage"));
+const ClassSectionManagerPage = lazy(() => import("./pages/ClassSectionManagerPage"));
+const CourseSubjectManagerPage = lazy(() => import("./pages/CourseSubjectManagerPage"));
 
 // Create query client with better error and retry handling for production
 const queryClient = new QueryClient({
@@ -30,6 +35,10 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: import.meta.env.PROD,
       staleTime: 5 * 60 * 1000, // 5 minutes
+      useErrorBoundary: true,
+    },
+    mutations: {
+      useErrorBoundary: true,
     },
   },
 });
@@ -39,7 +48,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
   
   if (loading) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+    return <LoadingFallback />;
   }
   
   if (!isAuthenticated) {
@@ -50,37 +59,109 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => (
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <SidebarProvider>
-              <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/students" element={<ProtectedRoute><StudentsPage /></ProtectedRoute>} />
-                <Route path="/teachers" element={<ProtectedRoute><TeachersPage /></ProtectedRoute>} />
-                <Route path="/attendance" element={<ProtectedRoute><AttendancePage /></ProtectedRoute>} />
-                <Route path="/timetable" element={<ProtectedRoute><TimetablePage /></ProtectedRoute>} />
-                <Route path="/fees" element={<ProtectedRoute><FeesPage /></ProtectedRoute>} />
-                <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
-                <Route path="/notices" element={<ProtectedRoute><NoticesPage /></ProtectedRoute>} />
-                <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-                <Route path="/academic-year-settings" element={<ProtectedRoute><AcademicYearSettingsPage /></ProtectedRoute>} />
-                <Route path="/class-section-manager" element={<ProtectedRoute><ClassSectionManagerPage /></ProtectedRoute>} />
-                <Route path="/course-subject-manager" element={<ProtectedRoute><CourseSubjectManagerPage /></ProtectedRoute>} />
-                <Route path="/" element={<Navigate to="/login" replace />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </SidebarProvider>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  </ErrorBoundary>
+  <React.StrictMode>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner richColors closeButton />
+            <BrowserRouter>
+              <SidebarProvider>
+                <Routes>
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/students" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <StudentsPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/teachers" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <TeachersPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/attendance" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <AttendancePage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/timetable" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <TimetablePage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/fees" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <FeesPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/reports" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <ReportsPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/notices" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <NoticesPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/settings" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <SettingsPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/academic-year-settings" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <AcademicYearSettingsPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/class-section-manager" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <ClassSectionManagerPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/course-subject-manager" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <CourseSubjectManagerPage />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/" element={<Navigate to="/login" replace />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </SidebarProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  </React.StrictMode>
 );
 
 export default App;

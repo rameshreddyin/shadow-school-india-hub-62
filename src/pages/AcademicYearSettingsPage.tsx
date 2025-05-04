@@ -513,7 +513,7 @@ const AcademicYearSettingsPage: React.FC = () => {
             </div>
             
             {!hasActiveYear && !formData.isActive && (
-              <Alert variant="warning" className="bg-amber-50 text-amber-800 border-amber-200">
+              <Alert variant="default" className="bg-amber-50 text-amber-800 border-amber-200">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   No active year is currently set. It is recommended to set this as the active year.
@@ -522,7 +522,7 @@ const AcademicYearSettingsPage: React.FC = () => {
             )}
             
             {hasActiveYear && formData.isActive && !editingYear?.isActive && (
-              <Alert variant="warning" className="bg-amber-50 text-amber-800 border-amber-200">
+              <Alert variant="default" className="bg-amber-50 text-amber-800 border-amber-200">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   Setting this as active will deactivate the current active year.

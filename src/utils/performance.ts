@@ -89,7 +89,7 @@ export const withPerformanceMonitoring = <P extends object>(
       recordComponentRender(componentName, startTime);
     }, []);
     
-    return <Component {...props} />;
+    return React.createElement(Component, props);
   };
   
   WithPerformance.displayName = `WithPerformance(${componentName})`;

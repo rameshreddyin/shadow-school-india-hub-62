@@ -75,11 +75,21 @@ const EditNoticeDialog: React.FC<EditNoticeDialogProps> = ({
   });
 
   function onSubmit(data: NoticeFormValues) {
-    onSave({
-      ...data,
+    // Ensure all required fields are included and convert dates to ISO strings
+    const updatedNotice: Notice = {
+      id: data.id,
+      title: data.title,
+      body: data.body,
+      audience: data.audience,
+      priority: data.priority,
       visibleFrom: data.visibleFrom.toISOString(),
       visibleUntil: data.visibleUntil.toISOString(),
-    });
+      createdAt: data.createdAt,
+      status: data.status,
+      attachments: data.attachments || [],
+    };
+    
+    onSave(updatedNotice);
   }
 
   return (

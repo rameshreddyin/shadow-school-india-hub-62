@@ -102,14 +102,21 @@ const SchoolTimingsSettings: React.FC = () => {
   const handlePeriodChange = (id: string, field: keyof PeriodTiming, value: string | boolean | number) => {
     setPeriodTimings(periodTimings.map(period => {
       if (period.id === id) {
-        // Update automatic label for non-break periods when period number changes
-        if (field === 'periodNo' && !period.isBreak) {
-          return { ...period, [field]: value, label: `Period ${value}` };
+        // For periodNo field, ensure we convert the value to a number
+        if (field === 'periodNo') {
+          const numValue = typeof value === 'string' ? parseInt(value, 10) : Number(value);
+          // Update automatic label for non-break periods when period number changes
+          if (!period.isBreak) {
+            return { ...period, [field]: numValue, label: `Period ${numValue}` };
+          }
+          return { ...period, [field]: numValue };
         }
+        
         // Update label to "Break" when isBreak is toggled to true
         if (field === 'isBreak' && value === true) {
           return { ...period, [field]: value, label: 'Break' };
         }
+        
         return { ...period, [field]: value };
       }
       return period;
@@ -206,7 +213,7 @@ const SchoolTimingsSettings: React.FC = () => {
                         type="number"
                         min="1"
                         value={period.periodNo}
-                        onChange={(e) => handlePeriodChange(period.id, 'periodNo', parseInt(e.target.value))}
+                        onChange={(e) => handlePeriodChange(period.id, 'periodNo', parseInt(e.target.value, 10))}
                         className="w-16"
                       />
                     </TableCell>

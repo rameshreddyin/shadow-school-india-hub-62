@@ -70,9 +70,6 @@ const AddNoticeForm: React.FC = () => {
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
       status: 'published',
-      // Convert Date objects to ISO strings to match the Notice type
-      visibleFrom: data.visibleFrom.toISOString(),
-      visibleUntil: data.visibleUntil.toISOString(),
     };
     
     console.log(newNotice);

@@ -107,14 +107,18 @@ interface AddTeacherFormProps {
   onAddAnother: () => void;
 }
 
+type DayId = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+
+type FormValues = z.infer<typeof formSchema>;
+
 const weekDays = [
-  { id: 'monday', label: 'Monday' },
-  { id: 'tuesday', label: 'Tuesday' },
-  { id: 'wednesday', label: 'Wednesday' },
-  { id: 'thursday', label: 'Thursday' },
-  { id: 'friday', label: 'Friday' },
-  { id: 'saturday', label: 'Saturday' },
-  { id: 'sunday', label: 'Sunday' },
+  { id: 'monday' as DayId, label: 'Monday' },
+  { id: 'tuesday' as DayId, label: 'Tuesday' },
+  { id: 'wednesday' as DayId, label: 'Wednesday' },
+  { id: 'thursday' as DayId, label: 'Thursday' },
+  { id: 'friday' as DayId, label: 'Friday' },
+  { id: 'saturday' as DayId, label: 'Saturday' },
+  { id: 'sunday' as DayId, label: 'Sunday' },
 ];
 
 const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother }) => {
@@ -124,7 +128,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
   const [standardTimeFrom, setStandardTimeFrom] = React.useState("");
   const [standardTimeTo, setStandardTimeTo] = React.useState("");
   
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -174,9 +178,11 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
   const handleApplyToAll = () => {
     if (applyToAll && standardTimeFrom && standardTimeTo) {
       weekDays.forEach(day => {
-        if (form.getValues(`availability.${day.id}.available`)) {
-          form.setValue(`availability.${day.id}.from`, standardTimeFrom);
-          form.setValue(`availability.${day.id}.to`, standardTimeTo);
+        // Using type-safe approach by accessing the specific day properties
+        const dayId = day.id;
+        if (form.getValues(`availability.${dayId}.available`)) {
+          form.setValue(`availability.${dayId}.from` as const, standardTimeFrom);
+          form.setValue(`availability.${dayId}.to` as const, standardTimeTo);
         }
       });
     }
@@ -188,7 +194,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
     }
   }, [standardTimeFrom, standardTimeTo, applyToAll]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>, addAnother = false) => {
+  const onSubmit = async (values: FormValues, addAnother = false) => {
     try {
       // This is a mock submission - would be replaced with actual API call
       console.log('Submitting teacher data:', values);
@@ -771,7 +777,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                           <td className="p-2">
                             <FormField
                               control={form.control}
-                              name={`availability.${day.id}.available`}
+                              name={`availability.${day.id}.available` as const}
                               render={({ field }) => (
                                 <FormItem>
                                   <FormControl>
@@ -787,14 +793,14 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                           <td className="p-2">
                             <FormField
                               control={form.control}
-                              name={`availability.${day.id}.from`}
+                              name={`availability.${day.id}.from` as const}
                               render={({ field }) => (
                                 <FormItem>
                                   <FormControl>
                                     <Input
                                       type="time"
                                       {...field}
-                                      disabled={!form.getValues(`availability.${day.id}.available`)}
+                                      disabled={!form.getValues(`availability.${day.id}.available` as const)}
                                     />
                                   </FormControl>
                                 </FormItem>
@@ -804,14 +810,14 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                           <td className="p-2">
                             <FormField
                               control={form.control}
-                              name={`availability.${day.id}.to`}
+                              name={`availability.${day.id}.to` as const}
                               render={({ field }) => (
                                 <FormItem>
                                   <FormControl>
                                     <Input
                                       type="time"
                                       {...field}
-                                      disabled={!form.getValues(`availability.${day.id}.available`)}
+                                      disabled={!form.getValues(`availability.${day.id}.available` as const)}
                                     />
                                   </FormControl>
                                 </FormItem>
@@ -849,3 +855,4 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
 };
 
 export default AddTeacherForm;
+

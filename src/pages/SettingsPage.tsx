@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/tabs';
 import AcademicYearSettings from '@/components/settings/AcademicYearSettings';
 import FeeStructureManager from '@/components/settings/FeeStructureManager';
+import SchoolTimingsSettings from '@/components/settings/SchoolTimingsSettings';
 
 const SettingsPage: React.FC = () => {
   return (
@@ -22,9 +23,10 @@ const SettingsPage: React.FC = () => {
         </div>
 
         <Tabs defaultValue="academic-year" className="w-full">
-          <TabsList className="mb-4 w-full md:w-auto">
+          <TabsList className="mb-4 w-full md:w-auto overflow-x-auto">
             <TabsTrigger value="academic-year">Academic Year</TabsTrigger>
             <TabsTrigger value="fee-structure">Fee Structure</TabsTrigger>
+            <TabsTrigger value="school-timings">School Timings</TabsTrigger>
             <TabsTrigger value="general">General Settings</TabsTrigger>
           </TabsList>
           
@@ -34,6 +36,10 @@ const SettingsPage: React.FC = () => {
           
           <TabsContent value="fee-structure" className="space-y-4">
             <FeeStructureManager />
+          </TabsContent>
+          
+          <TabsContent value="school-timings" className="space-y-4">
+            <SchoolTimingsSettings />
           </TabsContent>
           
           <TabsContent value="general" className="space-y-4">

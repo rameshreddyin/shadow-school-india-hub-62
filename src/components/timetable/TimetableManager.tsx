@@ -15,9 +15,10 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Copy, Plus } from 'lucide-react';
+import { AlertTriangle, Copy, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Link } from 'react-router-dom';
 import TimetableGrid from './TimetableGrid';
 import AddPeriodModal from './AddPeriodModal';
 import CopyTimetableModal from './CopyTimetableModal';
@@ -77,9 +78,9 @@ const TimetableManager: React.FC = () => {
     setSelectedSection(value);
   };
   
-  const handleAddPeriod = () => {
+  const handleAddPeriod = (day: string, slot: string) => {
     setEditingPeriod(null);
-    setEditingCell(null);
+    setEditingCell({ day, slot });
     setAddPeriodModalOpen(true);
   };
   
@@ -123,11 +124,10 @@ const TimetableManager: React.FC = () => {
   };
   
   const handleSavePeriod = (periodData: Period) => {
-    if (!currentTimetable) return;
+    if (!currentTimetable || !editingCell) return;
     
-    // If editingCell is null (adding a new period), use the values from periodData
-    const day = editingCell ? editingCell.day : periodData.timeSlot.id;
-    const slot = editingCell ? editingCell.slot : periodData.timeSlot.id;
+    const day = editingCell.day;
+    const slot = editingCell.slot;
     
     // Check for teacher conflicts
     const hasConflict = Object.entries(currentTimetable.days).some(([currentDay, dayData]) => {
@@ -271,11 +271,13 @@ const TimetableManager: React.FC = () => {
               Copy from Class
             </Button>
             <Button 
-              onClick={handleAddPeriod}
-              disabled={!selectedClass || !selectedSection}
+              variant="outline"
+              asChild
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Period
+              <Link to="/settings">
+                <Settings className="h-4 w-4 mr-2" />
+                Manage Periods
+              </Link>
             </Button>
           </div>
         </div>
@@ -291,6 +293,7 @@ const TimetableManager: React.FC = () => {
             timetable={currentTimetable}
             onEditPeriod={handleEditPeriod}
             onClearPeriod={handleClearPeriod}
+            onAddPeriod={handleAddPeriod}
           />
         ) : (
           <Alert>

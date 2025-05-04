@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Pencil, X } from 'lucide-react';
+import { Pencil, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -17,12 +17,14 @@ interface TimetableGridProps {
   timetable: Timetable;
   onEditPeriod: (day: string, slot: string) => void;
   onClearPeriod: (day: string, slot: string) => void;
+  onAddPeriod: (day: string, slot: string) => void;
 }
 
 const TimetableGrid: React.FC<TimetableGridProps> = ({ 
   timetable, 
   onEditPeriod, 
-  onClearPeriod 
+  onClearPeriod,
+  onAddPeriod
 }) => {
   // Get days and time slots from timetable
   const days = Object.keys(timetable.days);
@@ -66,9 +68,9 @@ const TimetableGrid: React.FC<TimetableGridProps> = ({
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 text-muted-foreground"
-            onClick={() => onEditPeriod(day, slot)}
+            onClick={() => onAddPeriod(day, slot)}
           >
-            <Pencil className="h-4 w-4" />
+            <Plus className="h-4 w-4" />
             <span className="sr-only">Add Period</span>
           </Button>
         </div>

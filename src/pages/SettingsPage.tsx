@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
+import { useLocation } from 'react-router-dom';
 import { 
   Tabs, 
   TabsContent, 
@@ -12,6 +13,23 @@ import FeeStructureManager from '@/components/settings/FeeStructureManager';
 import SchoolTimingsSettings from '@/components/settings/SchoolTimingsSettings';
 
 const SettingsPage: React.FC = () => {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<string>("academic-year");
+  
+  // Check if we have a tab parameter in the URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab && ['academic-year', 'fee-structure', 'school-timings', 'general'].includes(tab)) {
+      setActiveTab(tab);
+    }
+    
+    // Also check if we're coming from the timetable page
+    if (location.state && location.state.from === 'timetable') {
+      setActiveTab('school-timings');
+    }
+  }, [location]);
+  
   return (
     <AppLayout title="Settings">
       <div className="space-y-6">
@@ -22,7 +40,7 @@ const SettingsPage: React.FC = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="academic-year" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-4 w-full md:w-auto overflow-x-auto">
             <TabsTrigger value="academic-year">Academic Year</TabsTrigger>
             <TabsTrigger value="fee-structure">Fee Structure</TabsTrigger>

@@ -75,6 +75,8 @@ const AddPeriodModal: React.FC<AddPeriodModalProps> = ({
       setTimeSlot(editingPeriod.timeSlot.id);
       setSubject(editingPeriod.subject.id);
       setTeacher(editingPeriod.teacher.id);
+    } else if (editingCell && editingCell.slot) {
+      setTimeSlot(editingCell.slot);
     } else {
       setTimeSlot('');
       setSubject('');
@@ -135,6 +137,18 @@ const AddPeriodModal: React.FC<AddPeriodModalProps> = ({
   const getTimeSlotFromId = (slotId: string) => {
     const slot = mockTimeSlots.find(slot => slot.id === slotId);
     return slot ? `${slot.startTime} - ${slot.endTime}` : slotId;
+  };
+
+  // Find and display subject details
+  const getSubjectDetails = (subjectId: string) => {
+    const sub = mockSubjects.find(s => s.id === subjectId);
+    return sub ? `${sub.name} (${sub.code})` : subjectId;
+  };
+
+  // Find and display teacher details
+  const getTeacherDetails = (teacherId: string) => {
+    const teach = mockTeachers.find(t => t.id === teacherId);
+    return teach ? `${teach.name} (${teach.code})` : teacherId;
   };
   
   return (
@@ -205,11 +219,16 @@ const AddPeriodModal: React.FC<AddPeriodModalProps> = ({
                 <SelectContent>
                   {mockSubjects.map((sub) => (
                     <SelectItem key={sub.id} value={sub.id}>
-                      {sub.name}
+                      {sub.name} ({sub.code})
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {subject && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {getSubjectDetails(subject)}
+                </p>
+              )}
             </div>
             
             <div className="space-y-2">
@@ -226,7 +245,7 @@ const AddPeriodModal: React.FC<AddPeriodModalProps> = ({
                   {availableTeachers.length > 0 ? (
                     availableTeachers.map((t) => (
                       <SelectItem key={t.id} value={t.id}>
-                        {t.name}
+                        {t.name} ({t.code})
                       </SelectItem>
                     ))
                   ) : (
@@ -236,6 +255,11 @@ const AddPeriodModal: React.FC<AddPeriodModalProps> = ({
                   )}
                 </SelectContent>
               </Select>
+              {teacher && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {getTeacherDetails(teacher)}
+                </p>
+              )}
             </div>
             
             {subject && availableTeachers.length === 0 && (

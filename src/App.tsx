@@ -18,6 +18,7 @@ import LoadingFallback from "./components/LoadingFallback";
 // Lazily loaded components
 const StudentsPage = lazy(() => import("./pages/StudentsPage"));
 const TeachersPage = lazy(() => import("./pages/TeachersPage"));
+const TeacherInfoPage = lazy(() => import("./pages/TeacherInfoPage"));
 const AttendancePage = lazy(() => import("./pages/AttendancePage"));
 const TimetablePage = lazy(() => import("./pages/TimetablePage"));
 const FeesPage = lazy(() => import("./pages/FeesPage"));
@@ -83,6 +84,13 @@ const App = () => (
                 <ProtectedRoute>
                   <Suspense fallback={<LoadingFallback />}>
                     <TeachersPage />
+                  </Suspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/teachers/:id" element={
+                <ProtectedRoute>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <TeacherInfoPage />
                   </Suspense>
                 </ProtectedRoute>
               } />

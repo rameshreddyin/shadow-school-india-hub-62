@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Search, Edit, Eye, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -97,6 +98,7 @@ const TeachersPage: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string>('All Roles');
   const [selectedSort, setSelectedSort] = useState<string>('Name A-Z');
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   // Filter teachers based on search query, department, and role
   const filteredTeachers = teachers.filter(teacher => {
@@ -131,6 +133,10 @@ const TeachersPage: React.FC = () => {
       .map(part => part[0])
       .join('')
       .toUpperCase();
+  };
+  
+  const handleViewTeacher = (id: string) => {
+    navigate(`/teachers/${id}`);
   };
 
   return (
@@ -230,7 +236,7 @@ const TeachersPage: React.FC = () => {
                         <p className="font-medium">{teacher.phone}</p>
                       </div>
                       <div className="flex items-center justify-end gap-2">
-                        <Button size="icon" variant="ghost">
+                        <Button size="icon" variant="ghost" onClick={() => handleViewTeacher(teacher.id)}>
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button size="icon" variant="ghost">
@@ -262,7 +268,7 @@ const TeachersPage: React.FC = () => {
                 </TableHeader>
                 <TableBody>
                   {sortedTeachers.map((teacher) => (
-                    <TableRow key={teacher.id}>
+                    <TableRow key={teacher.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleViewTeacher(teacher.id)}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8">
@@ -281,13 +287,21 @@ const TeachersPage: React.FC = () => {
                       <TableCell>{teacher.phone}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end space-x-1">
-                          <Button size="icon" variant="ghost" title="View">
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            title="View" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewTeacher(teacher.id);
+                            }}
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button size="icon" variant="ghost" title="Edit">
+                          <Button size="icon" variant="ghost" title="Edit" onClick={(e) => e.stopPropagation()}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button size="icon" variant="ghost" title="Delete">
+                          <Button size="icon" variant="ghost" title="Delete" onClick={(e) => e.stopPropagation()}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>

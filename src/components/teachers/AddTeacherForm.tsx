@@ -35,10 +35,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
-import { CalendarIcon, Plus, Trash2, Clock } from 'lucide-react';
+import { CalendarIcon, Plus, Trash2, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
+import { sanitizeFormData } from '@/utils/sanitize';
 
 // Define form schema with validation
 const formSchema = z.object({
@@ -122,11 +123,12 @@ const weekDays = [
 ];
 
 const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother }) => {
-  const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
-  const [activeTab, setActiveTab] = React.useState("basic-info");
-  const [applyToAll, setApplyToAll] = React.useState(false);
-  const [standardTimeFrom, setStandardTimeFrom] = React.useState("");
-  const [standardTimeTo, setStandardTimeTo] = React.useState("");
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("basic-info");
+  const [applyToAll, setApplyToAll] = useState(false);
+  const [standardTimeFrom, setStandardTimeFrom] = useState("");
+  const [standardTimeTo, setStandardTimeTo] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -196,11 +198,19 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
 
   const onSubmit = async (values: FormValues, addAnother = false) => {
     try {
+      setIsSubmitting(true);
+      
+      // Sanitize form data to prevent XSS attacks
+      const sanitizedValues = sanitizeFormData(values);
+      
       // This is a mock submission - would be replaced with actual API call
-      console.log('Submitting teacher data:', values);
+      console.log('Submitting teacher data:', sanitizedValues);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Show success message
-      toast.success(`Teacher ${values.name} added successfully!`);
+      toast.success(`Teacher ${sanitizedValues.name} added successfully!`);
       
       // Reset form or close dialog
       if (addAnother) {
@@ -214,6 +224,8 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
     } catch (error) {
       toast.error('Failed to add teacher. Please try again.');
       console.error('Error adding teacher:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -250,189 +262,200 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
           
           {/* Basic Information Tab */}
           <TabsContent value="basic-info" className="mt-4 space-y-4">
-            <div className="flex flex-col items-center sm:items-start mb-6">
-              <div className="mb-4">
-                <Avatar className="h-24 w-24">
-                  {photoPreview ? (
-                    <AvatarImage src={photoPreview} alt="Teacher photo" />
-                  ) : (
-                    <AvatarFallback className="text-lg">Photo</AvatarFallback>
+            <div className="flex flex-col sm:flex-row gap-8 items-start mb-6">
+              <div className="flex flex-col items-center">
+                <div className="mb-4">
+                  <Avatar className="h-32 w-32 border-2 border-primary/20">
+                    {photoPreview ? (
+                      <AvatarImage src={photoPreview} alt="Teacher photo" />
+                    ) : (
+                      <AvatarFallback className="text-3xl bg-muted">
+                        <Upload className="h-8 w-8 text-muted-foreground/60" />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                </div>
+                <div>
+                  <label 
+                    htmlFor="photo" 
+                    className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 bg-muted hover:bg-muted/80 rounded-md text-sm font-medium transition-colors"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Upload Photo
+                  </label>
+                  <Input
+                    id="photo"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="hidden"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1 text-center">Max size 2MB</p>
+                </div>
+              </div>
+              
+              <div className="grid gap-4 sm:grid-cols-2 flex-1">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter full name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </Avatar>
-              </div>
-              <div>
-                <Input
-                  id="photo"
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoChange}
-                  className="max-w-xs"
                 />
-                <p className="text-sm text-muted-foreground mt-1">Optional. Max size 2MB.</p>
-              </div>
-            </div>
-            
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter full name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="staffId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Staff ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter staff ID (optional)" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Leave blank for auto-generation
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="gender"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gender *</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-row space-x-4"
-                      >
-                        <FormItem className="flex items-center space-x-1 space-y-0">
+                
+                <FormField
+                  control={form.control}
+                  name="staffId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Staff ID</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter staff ID (optional)" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Leave blank for auto-generation
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender *</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-row space-x-4"
+                        >
+                          <FormItem className="flex items-center space-x-1 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="male" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Male</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-1 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="female" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Female</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-1 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="other" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Other</FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="dob"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date of Birth *</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
                           <FormControl>
-                            <RadioGroupItem value="male" />
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
                           </FormControl>
-                          <FormLabel className="font-normal">Male</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-1 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="female" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Female</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-1 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="other" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Other</FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="dob"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date of Birth *</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1940-01-01")
-                          }
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1940-01-01")
+                            }
+                            initialFocus
+                            className="rounded-md border shadow-md"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter phone number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter email address" {...field} type="email" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem className="sm:col-span-2">
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Enter address (optional)" 
+                          className="resize-none" 
+                          {...field} 
                         />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter phone number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Address *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter email address" {...field} type="email" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem className="sm:col-span-2">
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Enter address (optional)" 
-                        className="resize-none" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
             
             <div className="flex justify-end pt-4">
-              <Button type="button" onClick={goToNextTab}>
+              <Button type="button" onClick={goToNextTab} className="px-6">
                 Next Step
               </Button>
             </div>
@@ -440,116 +463,126 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
           
           {/* Role & Department Tab */}
           <TabsContent value="role-department" className="mt-4 space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="principal">Principal</SelectItem>
-                        <SelectItem value="vicePrincipal">Vice Principal</SelectItem>
-                        <SelectItem value="headOfDepartment">Head of Department</SelectItem>
-                        <SelectItem value="seniorTeacher">Senior Teacher</SelectItem>
-                        <SelectItem value="teacher">Teacher</SelectItem>
-                        <SelectItem value="assistant">Teaching Assistant</SelectItem>
-                        <SelectItem value="staff">Administrative Staff</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="department"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select department" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="science">Science</SelectItem>
-                        <SelectItem value="mathematics">Mathematics</SelectItem>
-                        <SelectItem value="languages">Languages</SelectItem>
-                        <SelectItem value="socialStudies">Social Studies</SelectItem>
-                        <SelectItem value="arts">Arts</SelectItem>
-                        <SelectItem value="physical">Physical Education</SelectItem>
-                        <SelectItem value="administration">Administration</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="qualification"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Qualification</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter qualification" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="joiningDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Joining Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
+            <Card className="border-muted/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Professional Information</CardTitle>
+                <CardDescription>
+                  Enter the teacher's role, department, and professional details
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="principal">Principal</SelectItem>
+                            <SelectItem value="vicePrincipal">Vice Principal</SelectItem>
+                            <SelectItem value="headOfDepartment">Head of Department</SelectItem>
+                            <SelectItem value="seniorTeacher">Senior Teacher</SelectItem>
+                            <SelectItem value="teacher">Teacher</SelectItem>
+                            <SelectItem value="assistant">Teaching Assistant</SelectItem>
+                            <SelectItem value="staff">Administrative Staff</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="department"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Department *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select department" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="science">Science</SelectItem>
+                            <SelectItem value="mathematics">Mathematics</SelectItem>
+                            <SelectItem value="languages">Languages</SelectItem>
+                            <SelectItem value="socialStudies">Social Studies</SelectItem>
+                            <SelectItem value="arts">Arts</SelectItem>
+                            <SelectItem value="physical">Physical Education</SelectItem>
+                            <SelectItem value="administration">Administration</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="qualification"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Qualification</FormLabel>
                         <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
+                          <Input placeholder="E.g., Ph.D. in Physics, M.Ed." {...field} />
                         </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => date > new Date()}
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="joiningDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Joining Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) => date > new Date()}
+                              initialFocus
+                              className="rounded-md border shadow-md"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </CardContent>
+            </Card>
             
             <div className="flex justify-between pt-4">
               <Button type="button" variant="outline" onClick={goToPreviousTab}>
@@ -563,16 +596,28 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
           
           {/* Subject & Classes Tab */}
           <TabsContent value="subject-classes" className="mt-4 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Assigned Subjects & Classes</CardTitle>
+            <Card className="border-muted/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Assigned Subjects & Classes</CardTitle>
                 <CardDescription>
                   Add the subjects and classes that this teacher will be teaching
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {fields.map((field, index) => (
-                  <div key={field.id} className="grid gap-4 mb-4 sm:grid-cols-3 items-end">
+                  <div key={field.id} className="grid gap-4 mb-6 sm:grid-cols-3 items-end relative">
+                    {index > 0 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-7 w-7 rounded-full bg-muted hover:bg-destructive hover:text-white"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                    
                     <FormField
                       control={form.control}
                       name={`subjectAssignments.${index}.subject`}
@@ -642,49 +687,33 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                       )}
                     />
                     
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <FormField
-                          control={form.control}
-                          name={`subjectAssignments.${index}.section`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Section</FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select section" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="A">A</SelectItem>
-                                  <SelectItem value="B">B</SelectItem>
-                                  <SelectItem value="C">C</SelectItem>
-                                  <SelectItem value="D">D</SelectItem>
-                                  <SelectItem value="E">E</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      
-                      {index > 0 && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="self-end"
-                          onClick={() => remove(index)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                    <FormField
+                      control={form.control}
+                      name={`subjectAssignments.${index}.section`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Section</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select section" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="A">A</SelectItem>
+                              <SelectItem value="B">B</SelectItem>
+                              <SelectItem value="C">C</SelectItem>
+                              <SelectItem value="D">D</SelectItem>
+                              <SelectItem value="E">E</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    </div>
+                    />
                   </div>
                 ))}
                 
@@ -713,15 +742,15 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
           
           {/* Availability Tab */}
           <TabsContent value="availability" className="mt-4 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Availability Schedule</CardTitle>
+            <Card className="border-muted/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Availability Schedule</CardTitle>
                 <CardDescription>
                   Set the days and times when the teacher is available for classes
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="mb-6 p-4 bg-muted/20 rounded-lg flex flex-col sm:flex-row sm:items-center gap-4">
                   <div className="flex items-center space-x-2">
                     <Checkbox 
                       id="applyToAll" 
@@ -758,7 +787,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                   )}
                 </div>
                 
-                <div className="border rounded-md">
+                <div className="border rounded-md overflow-hidden">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-muted/50">
@@ -770,7 +799,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                     </thead>
                     <tbody>
                       {weekDays.map((day) => (
-                        <tr key={day.id} className="border-t">
+                        <tr key={day.id} className="border-t hover:bg-muted/20">
                           <td className="p-2">
                             <span className="font-medium">{day.label}</span>
                           </td>
@@ -779,7 +808,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                               control={form.control}
                               name={`availability.${day.id}.available` as const}
                               render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="m-0">
                                   <FormControl>
                                     <Checkbox
                                       checked={field.value}
@@ -795,12 +824,13 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                               control={form.control}
                               name={`availability.${day.id}.from` as const}
                               render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="m-0">
                                   <FormControl>
                                     <Input
                                       type="time"
                                       {...field}
                                       disabled={!form.getValues(`availability.${day.id}.available` as const)}
+                                      className="max-w-[150px]"
                                     />
                                   </FormControl>
                                 </FormItem>
@@ -812,12 +842,13 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                               control={form.control}
                               name={`availability.${day.id}.to` as const}
                               render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="m-0">
                                   <FormControl>
                                     <Input
                                       type="time"
                                       {...field}
                                       disabled={!form.getValues(`availability.${day.id}.available` as const)}
+                                      className="max-w-[150px]"
                                     />
                                   </FormControl>
                                 </FormItem>
@@ -841,10 +872,13 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
                   type="button" 
                   variant="outline" 
                   onClick={() => onSubmit(form.getValues(), true)}
+                  disabled={isSubmitting}
                 >
                   Save & Add Another
                 </Button>
-                <Button type="submit">Save Teacher</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : 'Save Teacher'}
+                </Button>
               </div>
             </div>
           </TabsContent>
@@ -855,4 +889,3 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSuccess, onAddAnother
 };
 
 export default AddTeacherForm;
-

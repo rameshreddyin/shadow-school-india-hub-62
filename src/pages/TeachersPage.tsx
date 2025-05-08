@@ -28,6 +28,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AddTeacherDialog from '@/components/teachers/AddTeacherDialog';
+import EditTeacherDialog from '@/components/teachers/EditTeacherDialog';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Mock teacher data
 const teachers = [
@@ -41,6 +53,10 @@ const teachers = [
     email: 'rahul.sharma@school.edu',
     qualification: 'Ph.D. Physics',
     photo: '',
+    gender: 'Male',
+    address: '123 Education Street, Academic Colony, New Delhi',
+    dob: new Date('1980-05-15'),
+    joiningDate: new Date('2010-06-01'),
   },
   {
     id: '2',
@@ -52,6 +68,10 @@ const teachers = [
     email: 'priya.patel@school.edu',
     qualification: 'M.Sc. Mathematics',
     photo: '',
+    gender: 'Female',
+    address: '456 Knowledge Park, Faculty Housing, Mumbai',
+    dob: new Date('1985-03-22'),
+    joiningDate: new Date('2012-07-15'),
   },
   {
     id: '3',
@@ -63,6 +83,10 @@ const teachers = [
     email: 'anil.kumar@school.edu',
     qualification: 'M.A. English',
     photo: '',
+    gender: 'Male',
+    address: '789 Literature Lane, Faculty Quarters, Bangalore',
+    dob: new Date('1982-11-10'),
+    joiningDate: new Date('2015-03-20'),
   },
   {
     id: '4',
@@ -74,6 +98,10 @@ const teachers = [
     email: 'sunita.reddy@school.edu',
     qualification: 'M.A. History',
     photo: '',
+    gender: 'Female',
+    address: '101 History Avenue, Teacher Colony, Chennai',
+    dob: new Date('1987-04-25'),
+    joiningDate: new Date('2016-08-05'),
   },
   {
     id: '5',
@@ -85,6 +113,10 @@ const teachers = [
     email: 'rajesh.gupta@school.edu',
     qualification: 'Ph.D. Education',
     photo: '',
+    gender: 'Male',
+    address: '202 Admin Block, School Campus, Hyderabad',
+    dob: new Date('1975-09-30'),
+    joiningDate: new Date('2008-01-15'),
   },
 ];
 
@@ -97,8 +129,12 @@ const TeachersPage: React.FC = () => {
   const [selectedDepartment, setSelectedDepartment] = useState<string>('All Departments');
   const [selectedRole, setSelectedRole] = useState<string>('All Roles');
   const [selectedSort, setSelectedSort] = useState<string>('Name A-Z');
+  const [selectedTeacher, setSelectedTeacher] = useState<typeof teachers[0] | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Filter teachers based on search query, department, and role
   const filteredTeachers = teachers.filter(teacher => {
@@ -137,6 +173,27 @@ const TeachersPage: React.FC = () => {
   
   const handleViewTeacher = (id: string) => {
     navigate(`/teachers/${id}`);
+  };
+  
+  const handleEditTeacher = (teacher: typeof teachers[0], e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedTeacher(teacher);
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleDeleteTeacher = (teacher: typeof teachers[0], e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedTeacher(teacher);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const confirmDeleteTeacher = () => {
+    // In a real app, this would delete the teacher from your backend
+    toast({
+      title: 'Teacher Removed',
+      description: `${selectedTeacher?.name} has been removed successfully.`,
+    });
+    setIsDeleteDialogOpen(false);
   };
 
   return (
@@ -239,10 +296,18 @@ const TeachersPage: React.FC = () => {
                         <Button size="icon" variant="ghost" onClick={() => handleViewTeacher(teacher.id)}>
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost">
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          onClick={(e) => handleEditTeacher(teacher, e)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost">
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          onClick={(e) => handleDeleteTeacher(teacher, e)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -298,10 +363,20 @@ const TeachersPage: React.FC = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button size="icon" variant="ghost" title="Edit" onClick={(e) => e.stopPropagation()}>
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            title="Edit" 
+                            onClick={(e) => handleEditTeacher(teacher, e)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button size="icon" variant="ghost" title="Delete" onClick={(e) => e.stopPropagation()}>
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            title="Delete" 
+                            onClick={(e) => handleDeleteTeacher(teacher, e)}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -314,6 +389,32 @@ const TeachersPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Teacher Dialog */}
+      <EditTeacherDialog 
+        isOpen={isEditDialogOpen} 
+        onClose={() => setIsEditDialogOpen(false)} 
+        teacher={selectedTeacher} 
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this teacher?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete {selectedTeacher?.name}'s record
+              and remove all their data from the system.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteTeacher} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 };

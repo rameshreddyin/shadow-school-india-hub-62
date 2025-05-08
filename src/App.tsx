@@ -19,6 +19,7 @@ import LoadingFallback from "./components/LoadingFallback";
 const StudentsPage = lazy(() => import("./pages/StudentsPage"));
 const TeachersPage = lazy(() => import("./pages/TeachersPage"));
 const TeacherInfoPage = lazy(() => import("./pages/TeacherInfoPage"));
+const EditTeacherPage = lazy(() => import("./pages/EditTeacherPage"));
 const AttendancePage = lazy(() => import("./pages/AttendancePage"));
 const TimetablePage = lazy(() => import("./pages/TimetablePage"));
 const FeesPage = lazy(() => import("./pages/FeesPage"));
@@ -36,9 +37,6 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: import.meta.env.PROD,
       staleTime: 5 * 60 * 1000, // 5 minutes
-    },
-    mutations: {
-      // No specific mutation options needed
     },
   },
 });
@@ -91,6 +89,13 @@ const App = () => (
                 <ProtectedRoute>
                   <Suspense fallback={<LoadingFallback />}>
                     <TeacherInfoPage />
+                  </Suspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/teachers/edit/:id" element={
+                <ProtectedRoute>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <EditTeacherPage />
                   </Suspense>
                 </ProtectedRoute>
               } />

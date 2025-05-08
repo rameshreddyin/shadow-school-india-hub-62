@@ -127,6 +127,10 @@ const TeacherInfoPage: React.FC = () => {
     }).format(date);
   };
 
+  const handleEditTeacher = () => {
+    navigate(`/teachers/edit/${id}`);
+  };
+
   return (
     <AppLayout title={`Teacher: ${teacher.name}`}>
       <div className="space-y-6">
@@ -143,7 +147,7 @@ const TeacherInfoPage: React.FC = () => {
             <h1 className="text-2xl font-semibold tracking-tight">Teacher Profile</h1>
           </div>
           
-          <Button onClick={() => navigate(`/teachers/edit/${id}`)}>
+          <Button onClick={handleEditTeacher}>
             <Edit className="h-4 w-4 mr-2" />
             Edit Profile
           </Button>

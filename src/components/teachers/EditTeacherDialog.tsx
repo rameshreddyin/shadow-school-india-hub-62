@@ -21,6 +21,18 @@ interface Teacher {
   address?: string;
   dob?: Date;
   joiningDate?: Date;
+  subjects?: Array<{
+    subject: string;
+    class: string;
+    section: string;
+  }>;
+  availability?: {
+    [key: string]: {
+      available: boolean;
+      from: string;
+      to: string;
+    };
+  };
 }
 
 interface EditTeacherDialogProps {
@@ -68,7 +80,7 @@ const EditTeacherDialog: React.FC<EditTeacherDialogProps> = ({ isOpen, onClose, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Teacher</DialogTitle>
         </DialogHeader>

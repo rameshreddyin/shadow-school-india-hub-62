@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -24,6 +25,20 @@ const teachers = [
     address: '123 Education Street, Academic Colony, New Delhi',
     dob: new Date('1980-05-15'),
     joiningDate: new Date('2010-06-01'),
+    subjects: [
+      { subject: 'Physics', class: 'Class 11', section: 'A' },
+      { subject: 'Physics', class: 'Class 12', section: 'A' },
+      { subject: 'Science', class: 'Class 10', section: 'B' },
+    ],
+    availability: {
+      monday: { available: true, from: '09:00', to: '15:00' },
+      tuesday: { available: true, from: '09:00', to: '15:00' },
+      wednesday: { available: true, from: '09:00', to: '15:00' },
+      thursday: { available: true, from: '09:00', to: '15:00' },
+      friday: { available: true, from: '09:00', to: '13:00' },
+      saturday: { available: false, from: '', to: '' },
+      sunday: { available: false, from: '', to: '' },
+    }
   },
   {
     id: '2',
@@ -39,6 +54,20 @@ const teachers = [
     address: '456 Knowledge Park, Faculty Housing, Mumbai',
     dob: new Date('1985-03-22'),
     joiningDate: new Date('2012-07-15'),
+    subjects: [
+      { subject: 'Mathematics', class: 'Class 9', section: 'A' },
+      { subject: 'Mathematics', class: 'Class 10', section: 'A' },
+      { subject: 'Mathematics', class: 'Class 8', section: 'B' },
+    ],
+    availability: {
+      monday: { available: true, from: '08:30', to: '14:30' },
+      tuesday: { available: true, from: '08:30', to: '14:30' },
+      wednesday: { available: true, from: '08:30', to: '12:30' },
+      thursday: { available: true, from: '08:30', to: '14:30' },
+      friday: { available: true, from: '08:30', to: '14:30' },
+      saturday: { available: false, from: '', to: '' },
+      sunday: { available: false, from: '', to: '' },
+    }
   },
   {
     id: '3',
@@ -54,6 +83,20 @@ const teachers = [
     address: '789 Literature Lane, Faculty Quarters, Bangalore',
     dob: new Date('1982-11-10'),
     joiningDate: new Date('2015-03-20'),
+    subjects: [
+      { subject: 'English', class: 'Class 9', section: 'A' },
+      { subject: 'English', class: 'Class 10', section: 'B' },
+      { subject: 'Hindi', class: 'Class 8', section: 'C' },
+    ],
+    availability: {
+      monday: { available: true, from: '09:00', to: '15:00' },
+      tuesday: { available: true, from: '09:00', to: '15:00' },
+      wednesday: { available: true, from: '09:00', to: '15:00' },
+      thursday: { available: true, from: '09:00', to: '15:00' },
+      friday: { available: true, from: '09:00', to: '15:00' },
+      saturday: { available: false, from: '', to: '' },
+      sunday: { available: false, from: '', to: '' },
+    }
   },
   {
     id: '4',
@@ -69,6 +112,20 @@ const teachers = [
     address: '101 History Avenue, Teacher Colony, Chennai',
     dob: new Date('1987-04-25'),
     joiningDate: new Date('2016-08-05'),
+    subjects: [
+      { subject: 'History', class: 'Class 9', section: 'A' },
+      { subject: 'Geography', class: 'Class 10', section: 'B' },
+      { subject: 'Social Studies', class: 'Class 8', section: 'A' },
+    ],
+    availability: {
+      monday: { available: true, from: '09:00', to: '15:00' },
+      tuesday: { available: true, from: '09:00', to: '15:00' },
+      wednesday: { available: true, from: '09:00', to: '15:00' },
+      thursday: { available: true, from: '09:00', to: '15:00' },
+      friday: { available: true, from: '09:00', to: '15:00' },
+      saturday: { available: false, from: '', to: '' },
+      sunday: { available: false, from: '', to: '' },
+    }
   },
   {
     id: '5',
@@ -84,6 +141,16 @@ const teachers = [
     address: '202 Admin Block, School Campus, Hyderabad',
     dob: new Date('1975-09-30'),
     joiningDate: new Date('2008-01-15'),
+    subjects: [],
+    availability: {
+      monday: { available: true, from: '08:00', to: '16:00' },
+      tuesday: { available: true, from: '08:00', to: '16:00' },
+      wednesday: { available: true, from: '08:00', to: '16:00' },
+      thursday: { available: true, from: '08:00', to: '16:00' },
+      friday: { available: true, from: '08:00', to: '16:00' },
+      saturday: { available: false, from: '', to: '' },
+      sunday: { available: false, from: '', to: '' },
+    }
   },
 ];
 
@@ -132,7 +199,7 @@ const EditTeacherPage: React.FC = () => {
         </div>
         
         {/* Edit Form */}
-        <div className="rounded-md border bg-card p-6">
+        <div className="space-y-6">
           <EditTeacherForm 
             teacher={teacher} 
             onSubmit={handleSubmit} 

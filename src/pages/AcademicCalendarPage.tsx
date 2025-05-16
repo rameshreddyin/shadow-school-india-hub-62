@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Plus } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus, Printer } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -37,6 +37,8 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import PrintableCalendar from '@/components/academic-calendar/PrintableCalendar';
+import '@/components/academic-calendar/PrintStyles.css';
 
 // Types for calendar events
 interface CalendarEvent {
@@ -125,6 +127,7 @@ const AcademicCalendarPage: React.FC = () => {
   const [events, setEvents] = useState<CalendarEvent[]>(initialEvents);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
   const [newEvent, setNewEvent] = useState<Omit<CalendarEvent, 'id'>>({
     title: '',
     date: new Date(),
@@ -134,6 +137,7 @@ const AcademicCalendarPage: React.FC = () => {
   const [filterType, setFilterType] = useState<string>('all');
   
   const { toast } = useToast();
+  const printableContentRef = useRef<HTMLDivElement>(null);
 
   const filteredEvents = events
     .filter(event => filterType === 'all' || event.type === filterType)
@@ -190,6 +194,16 @@ const AcademicCalendarPage: React.FC = () => {
     });
   };
 
+  const handlePrint = () => {
+    // Close the dialog if open
+    setIsPrintPreviewOpen(false);
+    
+    // Let the dialog close, then print
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  };
+
   const getEventTypeColor = (type: string) => {
     switch (type) {
       case 'holiday':
@@ -227,6 +241,10 @@ const AcademicCalendarPage: React.FC = () => {
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
+
+            <Button variant="outline" onClick={() => setIsPrintPreviewOpen(true)}>
+              <Printer className="mr-2 h-4 w-4" /> Print
+            </Button>
 
             <Button onClick={() => setIsAddEventOpen(true)}>
               <Plus className="mr-2 h-4 w-4" /> Add Event
@@ -444,6 +462,48 @@ const AcademicCalendarPage: React.FC = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Print Preview Dialog */}
+        <Dialog 
+          open={isPrintPreviewOpen} 
+          onOpenChange={setIsPrintPreviewOpen}
+          className="print-dialog"
+        >
+          <DialogContent className="print-preview-container sm:max-w-[90%] max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle>Calendar Print Preview</DialogTitle>
+              <DialogDescription>
+                Review how the calendar will appear when printed
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="print-preview-scroll" ref={printableContentRef}>
+              <PrintableCalendar 
+                events={filteredEvents}
+                filterType={filterType}
+              />
+            </div>
+            
+            <DialogFooter className="mt-4">
+              <Button variant="outline" onClick={() => setIsPrintPreviewOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handlePrint}>
+                <Printer className="mr-2 h-4 w-4" /> Print Calendar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Hidden printable content for direct printing */}
+        <div className="hidden">
+          <div id="printable-content" className="print-calendar">
+            <PrintableCalendar 
+              events={filteredEvents}
+              filterType={filterType}
+            />
+          </div>
+        </div>
       </div>
     </AppLayout>
   );

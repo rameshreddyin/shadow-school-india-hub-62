@@ -29,6 +29,7 @@ const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const AcademicYearSettingsPage = lazy(() => import("./pages/AcademicYearSettingsPage"));
 const ClassSectionManagerPage = lazy(() => import("./pages/ClassSectionManagerPage"));
 const CourseSubjectManagerPage = lazy(() => import("./pages/CourseSubjectManagerPage"));
+const AcademicCalendarPage = lazy(() => import("./pages/AcademicCalendarPage"));
 
 // Create query client with better error and retry handling for production
 const queryClient = new QueryClient({
@@ -159,6 +160,13 @@ const App = () => (
                 <ProtectedRoute>
                   <Suspense fallback={<LoadingFallback />}>
                     <CourseSubjectManagerPage />
+                  </Suspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/academic-calendar" element={
+                <ProtectedRoute>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <AcademicCalendarPage />
                   </Suspense>
                 </ProtectedRoute>
               } />

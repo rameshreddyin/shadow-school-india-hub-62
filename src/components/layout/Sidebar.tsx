@@ -55,6 +55,11 @@ const Sidebar: React.FC = () => {
     },
     { 
       icon: Calendar, 
+      label: 'Academic Calendar', 
+      path: '/academic-calendar' 
+    },
+    { 
+      icon: Calendar, 
       label: 'Fees', 
       path: '/fees' 
     },

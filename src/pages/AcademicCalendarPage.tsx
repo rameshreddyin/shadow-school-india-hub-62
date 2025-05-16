@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, Plus, Printer } from 'lucide-react';
@@ -467,7 +466,6 @@ const AcademicCalendarPage: React.FC = () => {
         <Dialog 
           open={isPrintPreviewOpen} 
           onOpenChange={setIsPrintPreviewOpen}
-          className="print-dialog"
         >
           <DialogContent className="print-preview-container sm:max-w-[90%] max-h-[90vh]">
             <DialogHeader>

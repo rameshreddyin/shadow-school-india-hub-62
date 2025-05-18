@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search, Edit, Eye, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -27,8 +28,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AddStaffDialog from '@/components/teachers/AddStaffDialog';
-import EditTeacherDialog from '@/components/teachers/EditTeacherDialog';
 import { useToast } from '@/hooks/use-toast';
+import { StaffFormValues } from '@/schemas/teacher.schema';
+import EditStaffDialog from '@/components/staff/EditStaffDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -204,7 +206,8 @@ const TeachersPage: React.FC = () => {
   
   const handleEditStaff = (staff: typeof staffMembers[0], e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate(`/teachers/edit/${staff.id}`);
+    setSelectedStaff(staff);
+    setIsEditDialogOpen(true);
   };
   
   const handleDeleteStaff = (staff: typeof staffMembers[0], e: React.MouseEvent) => {
@@ -220,6 +223,18 @@ const TeachersPage: React.FC = () => {
       description: `${selectedStaff?.name} has been removed successfully.`,
     });
     setIsDeleteDialogOpen(false);
+  };
+
+  const handleUpdateStaff = (data: StaffFormValues) => {
+    // In a real app, this would update the staff in your backend
+    console.log('Updated staff data:', data);
+    
+    toast({
+      title: 'Staff Updated',
+      description: `${data.name}'s information has been updated successfully.`,
+    });
+    
+    setIsEditDialogOpen(false);
   };
 
   // Get role or job title depending on staff type
@@ -435,11 +450,12 @@ const TeachersPage: React.FC = () => {
         )}
       </div>
 
-      {/* Edit Staff Dialog */}
-      <EditTeacherDialog 
+      {/* Edit Staff Dialog - Replace EditTeacherDialog with EditStaffDialog */}
+      <EditStaffDialog 
         isOpen={isEditDialogOpen} 
         onClose={() => setIsEditDialogOpen(false)} 
-        teacher={selectedStaff} 
+        staff={selectedStaff}
+        onSubmit={handleUpdateStaff}
       />
 
       {/* Delete Confirmation Dialog */}

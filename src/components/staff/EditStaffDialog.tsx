@@ -36,20 +36,26 @@ interface EditStaffDialogProps {
   isOpen: boolean;
   onClose: () => void;
   staff: Staff | null;
+  onSubmit?: (data: StaffFormValues) => void;
 }
 
-const EditStaffDialog: React.FC<EditStaffDialogProps> = ({ isOpen, onClose, staff }) => {
+const EditStaffDialog: React.FC<EditStaffDialogProps> = ({ isOpen, onClose, staff, onSubmit }) => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
   const handleSubmit = (data: StaffFormValues) => {
-    // In a real app, this would update the staff in your backend
-    console.log('Updated staff data:', data);
-    
-    toast({
-      title: 'Staff Updated',
-      description: `${data.name}'s information has been updated successfully.`,
-    });
+    // Use provided onSubmit or default implementation
+    if (onSubmit) {
+      onSubmit(data);
+    } else {
+      // Default implementation
+      console.log('Updated staff data:', data);
+      
+      toast({
+        title: 'Staff Updated',
+        description: `${data.name}'s information has been updated successfully.`,
+      });
+    }
     
     onClose();
   };

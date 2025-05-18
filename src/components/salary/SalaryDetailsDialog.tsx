@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,8 +16,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CalendarIcon, CheckCircle, DollarSign, FileDown } from 'lucide-react';
+import { CalendarIcon, CheckCircle, DollarSign, Download, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 interface SalaryPayment {
   id: string;
@@ -47,6 +48,8 @@ const SalaryDetailsDialog: React.FC<SalaryDetailsDialogProps> = ({
   payment,
 }) => {
   const isMobile = useIsMobile();
+  const { toast } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Format payment method for display
   const formatPaymentMethod = (method: string) => {
@@ -62,6 +65,112 @@ const SalaryDetailsDialog: React.FC<SalaryDetailsDialogProps> = ({
       default:
         return method;
     }
+  };
+
+  // View payment history for this staff member
+  const handleViewHistory = () => {
+    if (!payment) return;
+    
+    // Here we would typically navigate to a filtered view of the payment history
+    // For demonstration, we'll show a toast notification
+    toast({
+      title: "Payment History",
+      description: `Viewing payment history for ${payment.staffName}`,
+    });
+    
+    // In a real application, you might do something like:
+    // router.push(`/salary/history?staffId=${payment.staffId}`);
+    
+    // For now, we'll just navigate to the history tab
+    const historyTabTrigger = document.querySelector('[data-state="inactive"][value="history"]');
+    if (historyTabTrigger && historyTabTrigger instanceof HTMLElement) {
+      historyTabTrigger.click();
+    }
+    
+    // Close the dialog
+    onOpenChange(false);
+  };
+
+  // Download payment receipt
+  const handleDownloadReceipt = async () => {
+    if (!payment) return;
+    
+    try {
+      setIsGenerating(true);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Generate receipt content
+      const receiptContent = generateReceiptContent(payment);
+      
+      // Create a Blob from the receipt content
+      const blob = new Blob([receiptContent], { type: 'text/plain' });
+      
+      // Create download link and trigger download
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `salary-receipt-${payment.staffId}-${payment.month}-${payment.year}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Receipt Downloaded",
+        description: "Salary receipt has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("Error generating receipt:", error);
+      toast({
+        title: "Download Failed",
+        description: "There was an error generating the receipt. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Generate receipt content (plain text for demonstration)
+  const generateReceiptContent = (payment: SalaryPayment): string => {
+    const deductions = payment.deductions || 0;
+    const bonuses = payment.bonuses || 0;
+    const netAmount = payment.amount - deductions + bonuses;
+    
+    return `
+=======================================================
+                SALARY RECEIPT
+=======================================================
+
+STAFF INFORMATION:
+-----------------
+Name: ${payment.staffName}
+ID: ${payment.staffId}
+Department: ${payment.department}
+
+PAYMENT DETAILS:
+--------------
+Payment Date: ${new Date(payment.date).toLocaleDateString()}
+Payment Period: ${payment.month} ${payment.year}
+Reference Number: ${payment.reference}
+Payment Method: ${formatPaymentMethod(payment.paymentMethod)}
+
+SALARY BREAKDOWN:
+---------------
+Base Salary: ₹${payment.amount.toLocaleString()}
+${deductions > 0 ? `Deductions: ₹${deductions.toLocaleString()}\n` : ''}${bonuses > 0 ? `Bonuses: ₹${bonuses.toLocaleString()}\n` : ''}
+NET AMOUNT: ₹${netAmount.toLocaleString()}
+
+${payment.notes ? `\nNOTES:\n${payment.notes}\n` : ''}
+=======================================================
+This is an electronically generated receipt.
+No signature required.
+=======================================================
+    `.trim();
   };
 
   if (!payment) return null;
@@ -146,13 +255,17 @@ const SalaryDetailsDialog: React.FC<SalaryDetailsDialogProps> = ({
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto" onClick={handleViewHistory}>
             <CalendarIcon className="h-4 w-4 mr-2" />
             View History
           </Button>
-          <Button className="w-full sm:w-auto">
+          <Button 
+            className="w-full sm:w-auto"
+            onClick={handleDownloadReceipt}
+            disabled={isGenerating}
+          >
             <FileDown className="h-4 w-4 mr-2" />
-            Download Receipt
+            {isGenerating ? 'Generating...' : 'Download Receipt'}
           </Button>
         </div>
       </div>

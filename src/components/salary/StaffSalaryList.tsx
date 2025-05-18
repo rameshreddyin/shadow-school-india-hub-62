@@ -154,6 +154,11 @@ const StaffSalaryList: React.FC<StaffSalaryListProps> = ({
     }
   };
 
+  // Handle pay button click - passing the staffId to the parent component
+  const handlePayClick = (staffId: string) => {
+    onRecordPayment(staffId);
+  };
+
   return (
     <>
       <div className="rounded-md border">
@@ -221,7 +226,7 @@ const StaffSalaryList: React.FC<StaffSalaryListProps> = ({
                       ) : (
                         <Button 
                           size="sm" 
-                          onClick={() => onRecordPayment(staff.staffId)}
+                          onClick={() => handlePayClick(staff.staffId)}
                         >
                           <DollarSign className="h-4 w-4 mr-1" />
                           Pay

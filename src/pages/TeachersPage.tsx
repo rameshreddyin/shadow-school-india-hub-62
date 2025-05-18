@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Edit, Eye, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -205,8 +204,7 @@ const TeachersPage: React.FC = () => {
   
   const handleEditStaff = (staff: typeof staffMembers[0], e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedStaff(staff);
-    setIsEditDialogOpen(true);
+    navigate(`/teachers/edit/${staff.id}`);
   };
   
   const handleDeleteStaff = (staff: typeof staffMembers[0], e: React.MouseEvent) => {

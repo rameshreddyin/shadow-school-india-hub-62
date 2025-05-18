@@ -18,13 +18,17 @@ const availabilitySchema = z.object({
   to: z.string().optional(),
 });
 
-// Teacher schema
-export const teacherSchema = z.object({
+// Staff type enum
+export const staffTypeEnum = z.enum(['teacher', 'administrative', 'finance', 'housekeeping', 'security', 'other']);
+
+// Base staff schema with common fields
+const baseStaffSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters"),
   employeeId: z.string().trim().min(1, "Employee ID is required"),
-  role: z.string().trim().min(1, "Role is required"),
+  staffType: staffTypeEnum,
   department: z.string().trim().min(1, "Department is required"),
   qualification: z.string().trim().min(1, "Qualification is required"),
+  salary: z.number().min(0, "Salary must be a positive number").optional(),
   joinDate: z.date({
     required_error: "Join date is required",
     invalid_type_error: "Please enter a valid date",
@@ -36,12 +40,43 @@ export const teacherSchema = z.object({
   email: z.string().trim().email("Please enter a valid email address"),
   address: z.string().trim().min(5, "Address must be at least 5 characters"),
   dob: z.date().optional(),
+});
+
+// Teacher specific schema
+export const teacherSchema = baseStaffSchema.extend({
+  role: z.string().trim().min(1, "Role is required"),
   subjects: z.array(teacherSubjectSchema).optional(),
   availability: z.record(
     z.string(),
     availabilitySchema
   ).optional(),
+}).refine(data => {
+  // If staff type is teacher, role is required
+  return data.staffType !== 'teacher' || (data.staffType === 'teacher' && data.role);
+}, {
+  message: "Role is required for teachers",
+  path: ["role"],
 });
 
+// Non-teaching staff schema
+export const nonTeachingStaffSchema = baseStaffSchema.extend({
+  jobTitle: z.string().trim().min(1, "Job title is required"),
+  responsibilities: z.string().trim().min(1, "Responsibilities are required"),
+  workSchedule: z.string().trim().optional(),
+});
+
+// Unified schema that conditionally validates based on staff type
+export const staffSchema = z.discriminatedUnion('staffType', [
+  teacherSchema.omit({ staffType: true }).extend({ staffType: z.literal('teacher') }),
+  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('administrative') }),
+  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('finance') }),
+  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('housekeeping') }),
+  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('security') }),
+  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('other') }),
+]);
+
 export type TeacherFormValues = z.infer<typeof teacherSchema>;
+export type NonTeachingStaffFormValues = z.infer<typeof nonTeachingStaffSchema>;
+export type StaffFormValues = z.infer<typeof staffSchema>;
 export type TeacherSubject = z.infer<typeof teacherSubjectSchema>;
+export type StaffType = z.infer<typeof staffTypeEnum>;

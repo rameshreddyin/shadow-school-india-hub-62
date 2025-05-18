@@ -10,13 +10,13 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import AddTeacherForm from './AddTeacherForm';
+import AddStaffForm from './AddStaffForm';
 
-interface AddTeacherDialogProps {
+interface AddStaffDialogProps {
   trigger?: React.ReactNode;
 }
 
-const AddTeacherDialog: React.FC<AddTeacherDialogProps> = ({ trigger }) => {
+const AddStaffDialog: React.FC<AddStaffDialogProps> = ({ trigger }) => {
   const [open, setOpen] = React.useState(false);
 
   const handleSuccess = () => {
@@ -33,21 +33,21 @@ const AddTeacherDialog: React.FC<AddTeacherDialogProps> = ({ trigger }) => {
         {trigger || (
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            <span>Add Teacher</span>
+            <span>Add Staff</span>
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Teacher</DialogTitle>
+          <DialogTitle>Add New Staff Member</DialogTitle>
           <DialogDescription>
-            Fill in the teacher details and click save when you're done.
+            Fill in the staff details and click save when you're done.
           </DialogDescription>
         </DialogHeader>
-        <AddTeacherForm onSuccess={handleSuccess} onAddAnother={handleAddAnother} />
+        <AddStaffForm onSuccess={handleSuccess} onAddAnother={handleAddAnother} />
       </DialogContent>
     </Dialog>
   );
 };
 
-export default AddTeacherDialog;
+export default AddStaffDialog;

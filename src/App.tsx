@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import StudentsPage from './pages/StudentsPage';
@@ -28,29 +28,27 @@ import './App.css';
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/students" element={<StudentsPage />} />
-          <Route path="/teachers" element={<TeachersPage />} />
-          <Route path="/teachers/:id" element={<StaffInfoPage />} />
-          <Route path="/teachers/edit/:id" element={<EditStaffPage />} />
-          <Route path="/classes" element={<ClassesPage />} />
-          <Route path="/academic-calendar" element={<AcademicCalendarPage />} />
-          <Route path="/notices" element={<NoticesPage />} />
-          <Route path="/timetable" element={<TimetablePage />} />
-          <Route path="/attendance" element={<AttendancePage />} />
-          <Route path="/fees" element={<FeesPage />} />
-          <Route path="/salary" element={<StaffSalaryPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/settings/academic-year" element={<AcademicYearSettingsPage />} />
-          <Route path="/settings/classes" element={<ClassSectionManagerPage />} />
-          <Route path="/settings/subjects" element={<CourseSubjectManagerPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/students" element={<StudentsPage />} />
+        <Route path="/teachers" element={<TeachersPage />} />
+        <Route path="/teachers/:id" element={<StaffInfoPage />} />
+        <Route path="/teachers/edit/:id" element={<EditStaffPage />} />
+        <Route path="/classes" element={<ClassesPage />} />
+        <Route path="/academic-calendar" element={<AcademicCalendarPage />} />
+        <Route path="/notices" element={<NoticesPage />} />
+        <Route path="/timetable" element={<TimetablePage />} />
+        <Route path="/attendance" element={<AttendancePage />} />
+        <Route path="/fees" element={<FeesPage />} />
+        <Route path="/salary" element={<StaffSalaryPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings/academic-year" element={<AcademicYearSettingsPage />} />
+        <Route path="/settings/classes" element={<ClassSectionManagerPage />} />
+        <Route path="/settings/subjects" element={<CourseSubjectManagerPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
       <Toaster />
     </>
   );

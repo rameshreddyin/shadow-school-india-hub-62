@@ -152,7 +152,7 @@ const SalaryPaymentDialog: React.FC<SalaryPaymentDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[550px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Record Salary Payment</DialogTitle>
           <DialogDescription>
@@ -161,7 +161,7 @@ const SalaryPaymentDialog: React.FC<SalaryPaymentDialogProps> = ({
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
             <FormField
               control={form.control}
               name="staffId"
@@ -190,7 +190,7 @@ const SalaryPaymentDialog: React.FC<SalaryPaymentDialogProps> = ({
               )}
             />
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <FormField
                 control={form.control}
                 name="month"
@@ -275,7 +275,7 @@ const SalaryPaymentDialog: React.FC<SalaryPaymentDialogProps> = ({
               )}
             />
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <FormField
                 control={form.control}
                 name="deductions"
@@ -412,7 +412,7 @@ const SalaryPaymentDialog: React.FC<SalaryPaymentDialogProps> = ({
                 <FormItem>
                   <FormLabel>Notes</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Additional notes (optional)" {...field} />
+                    <Textarea placeholder="Additional notes (optional)" className="resize-none" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

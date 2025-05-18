@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -99,68 +99,78 @@ const StaffSalaryList: React.FC<StaffSalaryListProps> = ({
   };
 
   return (
-    <ResponsiveTable>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Staff</TableHead>
-            <TableHead>Department</TableHead>
-            <TableHead className="text-right">Salary</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredStaff.map((staff) => (
-            <TableRow key={staff.id}>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>{getInitials(staff.name)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium">{staff.name}</div>
-                    <div className="text-xs text-muted-foreground">{staff.staffId}</div>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>{staff.department}</TableCell>
-              <TableCell className="text-right">₹{staff.salary.toLocaleString()}</TableCell>
-              <TableCell>
-                {staff.isPaid ? (
-                  <div className="flex items-center gap-1">
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Paid
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {staff.paymentDate && new Date(staff.paymentDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                ) : (
-                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    Pending
-                  </Badge>
-                )}
-              </TableCell>
-              <TableCell className="text-right">
-                {staff.isPaid ? (
-                  <Button size="sm" variant="outline">
-                    Details
-                  </Button>
-                ) : (
-                  <Button size="sm" onClick={onRecordPayment}>
-                    <DollarSign className="h-4 w-4 mr-1" />
-                    Pay
-                  </Button>
-                )}
-              </TableCell>
+    <div className="rounded-md border">
+      <ResponsiveTable>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Staff</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead className="text-right">Salary</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </ResponsiveTable>
+          </TableHeader>
+          <TableBody>
+            {filteredStaff.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  No staff members found matching your search.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredStaff.map((staff) => (
+                <TableRow key={staff.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>{getInitials(staff.name)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{staff.name}</div>
+                        <div className="text-xs text-muted-foreground">{staff.staffId}</div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{staff.department}</TableCell>
+                  <TableCell className="text-right">₹{staff.salary.toLocaleString()}</TableCell>
+                  <TableCell>
+                    {staff.isPaid ? (
+                      <div className="flex items-center gap-1">
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Paid
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {staff.paymentDate && new Date(staff.paymentDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                    ) : (
+                      <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                        <AlertCircle className="h-3 w-3 mr-1" />
+                        Pending
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {staff.isPaid ? (
+                      <Button size="sm" variant="outline">
+                        Details
+                      </Button>
+                    ) : (
+                      <Button size="sm" onClick={onRecordPayment}>
+                        <DollarSign className="h-4 w-4 mr-1" />
+                        Pay
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </ResponsiveTable>
+    </div>
   );
 };
 

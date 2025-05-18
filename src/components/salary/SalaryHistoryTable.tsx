@@ -157,62 +157,64 @@ const SalaryHistoryTable: React.FC<SalaryHistoryTableProps> = ({
         </div>
       </div>
       
-      <ResponsiveTable>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Staff</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead>Reference</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredHistory.length === 0 ? (
+      <div className="rounded-md border">
+        <ResponsiveTable>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                  No payment records found for {month} {year}
-                </TableCell>
+                <TableHead>Date</TableHead>
+                <TableHead>Staff</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead>Method</TableHead>
+                <TableHead>Reference</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : (
-              filteredHistory.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell>
-                    {new Date(payment.date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{payment.staffName}</div>
-                      <div className="text-xs text-muted-foreground">{payment.staffId}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{payment.department}</TableCell>
-                  <TableCell className="text-right font-medium">
-                    ₹{payment.amount.toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                      {formatPaymentMethod(payment.paymentMethod)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-xs font-mono">{payment.reference}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" variant="ghost">
-                      <FileText className="h-4 w-4" />
-                      <span className="sr-only">View Receipt</span>
-                    </Button>
+            </TableHeader>
+            <TableBody>
+              {filteredHistory.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                    No payment records found for {month} {year}
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </ResponsiveTable>
+              ) : (
+                filteredHistory.map((payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell>
+                      {new Date(payment.date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{payment.staffName}</div>
+                        <div className="text-xs text-muted-foreground">{payment.staffId}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{payment.department}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      ₹{payment.amount.toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        {formatPaymentMethod(payment.paymentMethod)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs font-mono">{payment.reference}</span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="outline">
+                        <FileText className="h-4 w-4 mr-1" />
+                        Receipt
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </ResponsiveTable>
+      </div>
     </div>
   );
 };

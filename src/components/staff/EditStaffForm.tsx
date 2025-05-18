@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { staffSchema, StaffFormValues } from '@/schemas/teacher.schema';
+import { staffSchema, StaffFormValues, teacherSubjectSchema } from '@/schemas/teacher.schema';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,8 +25,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, X } from 'lucide-react';
+import { Check, X, Plus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { Switch } from '@/components/ui/switch';
 
 interface Staff {
   id: string;
@@ -47,6 +48,10 @@ interface Staff {
   joiningDate?: Date;
   responsibilities?: string;
   workSchedule?: string;
+  subjects?: { subject: string; class: string; section: string }[];
+  availability?: {
+    [key: string]: { available: boolean; from: string; to: string };
+  };
 }
 
 interface EditStaffFormProps {
@@ -57,6 +62,28 @@ interface EditStaffFormProps {
 
 const departments = ['Science', 'Mathematics', 'Languages', 'Social Studies', 'Arts', 'Physical Education', 'Administration', 'Finance', 'Security', 'Housekeeping'];
 const roles = ['Principal', 'Vice Principal', 'Head of Department', 'Senior Teacher', 'Teacher', 'Teaching Assistant'];
+const weekDays = [
+  { id: 'monday', label: 'Monday' },
+  { id: 'tuesday', label: 'Tuesday' },
+  { id: 'wednesday', label: 'Wednesday' },
+  { id: 'thursday', label: 'Thursday' },
+  { id: 'friday', label: 'Friday' },
+  { id: 'saturday', label: 'Saturday' },
+  { id: 'sunday', label: 'Sunday' },
+];
+
+const subjects = [
+  'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Hindi',
+  'Social Studies', 'History', 'Geography', 'Computer Science', 'Physical Education',
+  'Arts', 'Music', 'Environmental Science'
+];
+
+const classes = [
+  'Nursery', 'KG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5',
+  'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'
+];
+
+const sections = ['A', 'B', 'C', 'D', 'E'];
 
 const EditStaffForm: React.FC<EditStaffFormProps> = ({ staff, onSubmit, onCancel }) => {
   const getInitials = (name: string) => {
@@ -87,9 +114,24 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ staff, onSubmit, onCancel
   
   // Add role if teacher
   if (isTeacher) {
-    defaultValues.role = staff.role;
+    defaultValues.role = staff.role || '';
+    defaultValues.subjects = staff.subjects || [];
+    
+    // Setup availability with default values if not present
+    defaultValues.availability = {};
+    weekDays.forEach(day => {
+      if (staff.availability && staff.availability[day.id]) {
+        defaultValues.availability[day.id] = staff.availability[day.id];
+      } else {
+        defaultValues.availability[day.id] = {
+          available: day.id !== 'saturday' && day.id !== 'sunday',
+          from: '09:00',
+          to: '15:00'
+        };
+      }
+    });
   } else {
-    defaultValues.jobTitle = staff.jobTitle;
+    defaultValues.jobTitle = staff.jobTitle || '';
     defaultValues.responsibilities = staff.responsibilities || "Responsibilities not specified";
     defaultValues.workSchedule = staff.workSchedule || "Regular working hours";
   }
@@ -100,6 +142,13 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ staff, onSubmit, onCancel
   });
   
   const staffType = form.watch('staffType');
+  
+  // Use field array for subjects if teacher
+  const { fields: subjectFields, append: appendSubject, remove: removeSubject } = 
+    useFieldArray({
+      control: form.control,
+      name: "subjects",
+    });
   
   const handleSubmit = (data: StaffFormValues) => {
     onSubmit(data);
@@ -465,6 +514,188 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ staff, onSubmit, onCancel
             )}
           </CardContent>
         </Card>
+        
+        {/* Teacher-specific fields */}
+        {staffType === 'teacher' && (
+          <>
+            {/* Subjects Card */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-xl">Assigned Subjects</CardTitle>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendSubject({ subject: "", class: "", section: "" })}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Subject
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {subjectFields.length === 0 ? (
+                  <div className="text-center py-4 text-muted-foreground">
+                    No subjects assigned. Click "Add Subject" to assign subjects.
+                  </div>
+                ) : (
+                  subjectFields.map((field, index) => (
+                    <div
+                      key={field.id}
+                      className="grid gap-4 md:grid-cols-4 items-end border p-4 rounded-md"
+                    >
+                      <FormField
+                        control={form.control}
+                        name={`subjects.${index}.subject`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Subject</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select subject" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {subjects.map((subject) => (
+                                  <SelectItem key={subject} value={subject}>
+                                    {subject}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name={`subjects.${index}.class`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Class</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select class" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {classes.map((cls) => (
+                                  <SelectItem key={cls} value={cls}>
+                                    {cls}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name={`subjects.${index}.section`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Section</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select section" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {sections.map((section) => (
+                                  <SelectItem key={section} value={section}>
+                                    {section}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => removeSubject(index)}
+                        className="h-10 w-10"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Availability Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Weekly Availability</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {weekDays.map((day) => (
+                  <div key={day.id} className="border p-4 rounded-md">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-medium">{day.label}</span>
+                      <FormField
+                        control={form.control}
+                        name={`availability.${day.id}.available`}
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2">
+                            <FormLabel>Available</FormLabel>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {form.watch(`availability.${day.id}.available`) && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name={`availability.${day.id}.from`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>From</FormLabel>
+                              <FormControl>
+                                <Input type="time" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`availability.${day.id}.to`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>To</FormLabel>
+                              <FormControl>
+                                <Input type="time" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </>
+        )}
         
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel}>

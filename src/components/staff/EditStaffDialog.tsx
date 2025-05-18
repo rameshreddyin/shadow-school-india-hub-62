@@ -24,6 +24,12 @@ interface Staff {
   address?: string;
   dob?: Date;
   joiningDate?: Date;
+  responsibilities?: string;
+  workSchedule?: string;
+  subjects?: { subject: string; class: string; section: string }[];
+  availability?: {
+    [key: string]: { available: boolean; from: string; to: string };
+  };
 }
 
 interface EditStaffDialogProps {

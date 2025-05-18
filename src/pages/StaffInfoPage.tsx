@@ -1,6 +1,10 @@
+
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Building, Calendar, Mail, MapPin, Phone, User, Edit, Clock, Briefcase, Award } from 'lucide-react';
+import { 
+  ArrowLeft, Building, Calendar, Mail, MapPin, Phone, User, Edit, 
+  Clock, Briefcase, Award, BookOpen, Users 
+} from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,6 +45,20 @@ const staffMembers = [
     joiningDate: new Date('2010-06-01'),
     responsibilities: 'Teaching Physics, Curriculum development, Lab management',
     workSchedule: 'Monday to Friday, 8:00 AM to 4:00 PM',
+    subjects: [
+      { subject: 'Physics', class: 'Class 11', section: 'A' },
+      { subject: 'Physics', class: 'Class 12', section: 'A' },
+      { subject: 'Science', class: 'Class 10', section: 'B' },
+    ],
+    availability: {
+      monday: { available: true, from: '09:00', to: '15:00' },
+      tuesday: { available: true, from: '09:00', to: '15:00' },
+      wednesday: { available: true, from: '09:00', to: '15:00' },
+      thursday: { available: true, from: '09:00', to: '15:00' },
+      friday: { available: true, from: '09:00', to: '13:00' },
+      saturday: { available: false, from: '', to: '' },
+      sunday: { available: false, from: '', to: '' },
+    }
   },
   {
     id: '2',
@@ -59,6 +77,20 @@ const staffMembers = [
     address: '456 Knowledge Park, Faculty Housing, Mumbai',
     dob: new Date('1985-03-22'),
     joiningDate: new Date('2012-07-15'),
+    subjects: [
+      { subject: 'Mathematics', class: 'Class 9', section: 'A' },
+      { subject: 'Mathematics', class: 'Class 10', section: 'A' },
+      { subject: 'Mathematics', class: 'Class 8', section: 'B' },
+    ],
+    availability: {
+      monday: { available: true, from: '08:30', to: '14:30' },
+      tuesday: { available: true, from: '08:30', to: '14:30' },
+      wednesday: { available: true, from: '08:30', to: '12:30' },
+      thursday: { available: true, from: '08:30', to: '14:30' },
+      friday: { available: true, from: '08:30', to: '14:30' },
+      saturday: { available: false, from: '', to: '' },
+      sunday: { available: false, from: '', to: '' },
+    }
   },
   {
     id: '3',
@@ -192,10 +224,16 @@ const StaffInfoPage: React.FC = () => {
             <h1 className="text-2xl font-semibold tracking-tight">Staff Profile</h1>
           </div>
           
-          <Button onClick={handleEdit}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit Profile
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate(`/teachers/edit/${id}`)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit in Full Page
+            </Button>
+            <Button onClick={handleEdit}>
+              <Edit className="h-4 w-4 mr-2" />
+              Quick Edit
+            </Button>
+          </div>
         </div>
         
         {/* Staff Profile Card */}
@@ -245,9 +283,10 @@ const StaffInfoPage: React.FC = () => {
         
         {/* Tabs for different sections of information */}
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="details">Personal Details</TabsTrigger>
             <TabsTrigger value="professional">Professional Info</TabsTrigger>
+            {isTeacher && <TabsTrigger value="teaching">Teaching Info</TabsTrigger>}
             <TabsTrigger value="salary">Salary & Schedule</TabsTrigger>
           </TabsList>
           
@@ -379,6 +418,118 @@ const StaffInfoPage: React.FC = () => {
               </CardContent>
             </Card>
           </TabsContent>
+          
+          {/* Teaching Info Tab (for teachers only) */}
+          {isTeacher && (
+            <TabsContent value="teaching" className="mt-6">
+              <div className="space-y-6">
+                {/* Subjects */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Assigned Subjects & Classes</CardTitle>
+                    <CardDescription>Subjects and classes taught by {staff.name}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {staff.subjects && staff.subjects.length > 0 ? (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Subject</TableHead>
+                            <TableHead>Class</TableHead>
+                            <TableHead>Section</TableHead>
+                            <TableHead>Students</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {staff.subjects.map((subj, idx) => (
+                            <TableRow key={idx}>
+                              <TableCell className="font-medium">
+                                <div className="flex items-center gap-2">
+                                  <BookOpen className="h-4 w-4 text-muted-foreground" />
+                                  {subj.subject}
+                                </div>
+                              </TableCell>
+                              <TableCell>{subj.class}</TableCell>
+                              <TableCell>{subj.section}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Users className="h-4 w-4 text-muted-foreground" />
+                                  <span>{Math.floor(Math.random() * 20) + 25}</span> {/* Mock data */}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ) : (
+                      <div className="text-center py-6 text-muted-foreground">
+                        No subjects assigned to this teacher.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+                
+                {/* Availability Schedule */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Weekly Availability Schedule</CardTitle>
+                    <CardDescription>Regular teaching hours for {staff.name}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {staff.availability ? (
+                      <div className="border rounded-md overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="w-[150px]">Day</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead>Hours</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {weekDays.map((day) => (
+                              <TableRow key={day.id}>
+                                <TableCell className="font-medium">
+                                  {day.label}
+                                </TableCell>
+                                <TableCell>
+                                  {staff.availability && staff.availability[day.id] && staff.availability[day.id].available ? (
+                                    <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+                                      Available
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">
+                                      Not Available
+                                    </Badge>
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  {staff.availability && staff.availability[day.id] && staff.availability[day.id].available ? (
+                                    <div className="flex items-center gap-2">
+                                      <Clock className="h-4 w-4 text-muted-foreground" />
+                                      <span>
+                                        {staff.availability[day.id].from} - {staff.availability[day.id].to}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    "-"
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 text-muted-foreground">
+                        No availability schedule set for this teacher.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          )}
           
           {/* Salary & Schedule Tab */}
           <TabsContent value="salary" className="mt-6">

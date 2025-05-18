@@ -2,7 +2,7 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getToken, setToken, removeToken, isTokenValid, setUserData, getUserData } from '@/utils/jwt';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 
 export interface AuthUser {
   id: string;
@@ -70,8 +70,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           removeToken();
           
           // Redirect to login if not already there
-          if (!location.pathname.includes('/login')) {
-            navigate('/login', { replace: true });
+          if (location.pathname !== '/' && !location.pathname.includes('/login')) {
+            navigate('/', { replace: true });
           }
         }
       } catch (error) {
@@ -109,16 +109,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUserData(mockUser);
         setUser(mockUser);
         
-        toast.success('Login successful');
-        navigate('/dashboard');
+        toast({
+          title: "Success",
+          description: "Login successful"
+        });
+        
+        // Force navigation to dashboard
+        navigate('/dashboard', { replace: true });
         return true;
       } else {
-        toast.error('Invalid email or password');
+        toast({
+          title: "Error",
+          description: "Invalid email or password",
+          variant: "destructive"
+        });
         return false;
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Login failed. Please try again.');
+      toast({
+        title: "Error",
+        description: "Login failed. Please try again.",
+        variant: "destructive"
+      });
       return false;
     } finally {
       setLoading(false);
@@ -128,8 +141,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     removeToken();
     setUser(null);
-    toast.success('Logged out successfully');
-    navigate('/login');
+    toast({
+      title: "Success",
+      description: "Logged out successfully"
+    });
+    navigate('/');
   };
 
   return (

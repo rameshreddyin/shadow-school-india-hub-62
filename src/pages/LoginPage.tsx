@@ -51,7 +51,9 @@ const LoginPage = () => {
       const sanitizedData = sanitizeFormData(data);
       
       // Login with sanitized data
-      await login(sanitizedData.email, sanitizedData.password);
+      const success = await login(sanitizedData.email, sanitizedData.password);
+      
+      // The navigation will be handled by the login function
     } catch (error) {
       console.error('Login error:', error);
     } finally {

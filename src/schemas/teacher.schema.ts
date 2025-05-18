@@ -67,12 +67,13 @@ export const nonTeachingStaffSchema = baseStaffSchema.extend({
 
 // Unified schema that conditionally validates based on staff type
 export const staffSchema = z.discriminatedUnion('staffType', [
-  teacherSchema.omit({ staffType: true }).extend({ staffType: z.literal('teacher') }),
-  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('administrative') }),
-  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('finance') }),
-  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('housekeeping') }),
-  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('security') }),
-  nonTeachingStaffSchema.omit({ staffType: true }).extend({ staffType: z.literal('other') }),
+  // Use proper type casting for Zod to work with extend
+  teacherSchema.extend({ staffType: z.literal('teacher') }),
+  nonTeachingStaffSchema.extend({ staffType: z.literal('administrative') }),
+  nonTeachingStaffSchema.extend({ staffType: z.literal('finance') }),
+  nonTeachingStaffSchema.extend({ staffType: z.literal('housekeeping') }),
+  nonTeachingStaffSchema.extend({ staffType: z.literal('security') }),
+  nonTeachingStaffSchema.extend({ staffType: z.literal('other') }),
 ]);
 
 export type TeacherFormValues = z.infer<typeof teacherSchema>;

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -40,7 +39,7 @@ import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { sanitizeFormData } from '@/utils/sanitize';
-import { StaffType, staffTypeEnum } from '@/schemas/teacher.schema';
+import { StaffType, staffTypeEnum, teacherSchema, nonTeachingStaffSchema } from '@/schemas/teacher.schema';
 
 // Teacher form section (reused from existing component)
 const TeacherFormSection = ({ form, activeTab, setActiveTab, goToPreviousTab, goToNextTab, isSubmitting, onSubmit, fields, append, remove }) => {

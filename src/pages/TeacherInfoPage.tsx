@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
@@ -20,8 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import EditTeacherDialog from '@/components/teachers/EditTeacherDialog';
+import EditStaffDialog from '@/components/staff/EditStaffDialog';
 import { useToast } from '@/hooks/use-toast';
+import { devLog } from '@/utils/environment';
 
 // Mock teacher data (in production would be fetched from API)
 const teachers = [
@@ -83,6 +83,35 @@ const teachers = [
       sunday: { available: false, from: '', to: '' },
     }
   },
+  {
+    id: '3',
+    name: 'Anil Kumar',
+    staffId: 'TCH003',
+    department: 'Languages',
+    role: 'Teacher',
+    phone: '9876543212',
+    email: 'anil.kumar@school.edu',
+    qualification: 'M.A. English',
+    photo: '',
+    gender: 'Male',
+    address: '789 Literature Lane, Faculty Quarters, Bangalore',
+    dob: new Date('1982-11-10'),
+    joiningDate: new Date('2015-03-20'),
+    subjects: [
+      { subject: 'English', class: 'Class 6', section: 'A' },
+      { subject: 'English', class: 'Class 7', section: 'B' },
+      { subject: 'English', class: 'Class 8', section: 'A' },
+    ],
+    availability: {
+      monday: { available: true, from: '09:30', to: '15:30' },
+      tuesday: { available: true, from: '09:30', to: '15:30' },
+      wednesday: { available: true, from: '09:30', to: '15:30' },
+      thursday: { available: true, from: '09:30', to: '15:30' },
+      friday: { available: true, from: '09:30', to: '13:30' },
+      saturday: { available: false, from: '', to: '' },
+      sunday: { available: false, from: '', to: '' },
+    }
+  },
   // ... other teachers
 ];
 
@@ -112,7 +141,14 @@ const TeacherInfoPage: React.FC = () => {
   
   // Redirect to teachers list if teacher not found
   if (!teacher) {
-    navigate('/teachers');
+    React.useEffect(() => {
+      toast({
+        title: "Teacher Not Found",
+        description: "The requested teacher profile could not be found.",
+        variant: "destructive"
+      });
+      navigate('/teachers');
+    }, [navigate, toast]);
     return null;
   }
   
@@ -135,6 +171,19 @@ const TeacherInfoPage: React.FC = () => {
   const handleEditTeacher = () => {
     setIsEditDialogOpen(true);
   };
+
+  const handleEditSuccess = () => {
+    toast({
+      title: "Profile Updated",
+      description: `${teacher.name}'s profile has been updated successfully.`,
+    });
+    setIsEditDialogOpen(false);
+  };
+
+  // Log page view for analytics (development only)
+  React.useEffect(() => {
+    devLog(`Viewed teacher profile: ${teacher.id} - ${teacher.name}`);
+  }, [teacher]);
 
   return (
     <AppLayout title={`Teacher: ${teacher.name}`}>
@@ -474,10 +523,11 @@ const TeacherInfoPage: React.FC = () => {
       </div>
       
       {/* Edit Teacher Dialog */}
-      <EditTeacherDialog 
+      <EditStaffDialog 
         isOpen={isEditDialogOpen} 
         onClose={() => setIsEditDialogOpen(false)} 
-        teacher={teacher}
+        staff={teacher}
+        onSubmit={handleEditSuccess}
       />
     </AppLayout>
   );

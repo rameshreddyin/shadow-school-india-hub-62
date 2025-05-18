@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import SalaryDetailsDialog from './SalaryDetailsDialog';
 
 // Mock payment history data
 const paymentHistory = [
@@ -34,6 +35,9 @@ const paymentHistory = [
     year: 2025,
     paymentMethod: 'bank',
     reference: 'TRX123456',
+    deductions: 2000,
+    bonuses: 5000,
+    notes: 'Includes performance bonus for excellent research work.',
   },
   {
     id: '2',
@@ -96,6 +100,8 @@ const SalaryHistoryTable: React.FC<SalaryHistoryTableProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('All Methods');
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<(typeof paymentHistory)[0] | null>(null);
 
   // Filter payment history based on month, year, search query, and payment method
   const filteredHistory = paymentHistory.filter((payment) => {
@@ -124,6 +130,12 @@ const SalaryHistoryTable: React.FC<SalaryHistoryTableProps> = ({
       default:
         return method;
     }
+  };
+
+  // Handle showing payment details
+  const handleShowDetails = (payment: (typeof paymentHistory)[0]) => {
+    setSelectedPayment(payment);
+    setIsDetailsOpen(true);
   };
 
   return (
@@ -180,7 +192,11 @@ const SalaryHistoryTable: React.FC<SalaryHistoryTableProps> = ({
                 </TableRow>
               ) : (
                 filteredHistory.map((payment) => (
-                  <TableRow key={payment.id}>
+                  <TableRow 
+                    key={payment.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleShowDetails(payment)}
+                  >
                     <TableCell>
                       {new Date(payment.date).toLocaleDateString()}
                     </TableCell>
@@ -203,7 +219,14 @@ const SalaryHistoryTable: React.FC<SalaryHistoryTableProps> = ({
                       <span className="text-xs font-mono">{payment.reference}</span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent row click
+                          handleShowDetails(payment);
+                        }}
+                      >
                         <FileText className="h-4 w-4 mr-1" />
                         Receipt
                       </Button>
@@ -215,6 +238,13 @@ const SalaryHistoryTable: React.FC<SalaryHistoryTableProps> = ({
           </Table>
         </ResponsiveTable>
       </div>
+
+      {/* Payment Details Dialog */}
+      <SalaryDetailsDialog
+        open={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+        payment={selectedPayment}
+      />
     </div>
   );
 };

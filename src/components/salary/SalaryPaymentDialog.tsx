@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -85,6 +85,7 @@ interface SalaryPaymentDialogProps {
   onOpenChange: (open: boolean) => void;
   selectedMonth: string;
   selectedYear: string;
+  selectedStaffId?: string;
 }
 
 const formSchema = salaryTransactionSchema.omit({ id: true });
@@ -93,14 +94,15 @@ const SalaryPaymentDialog: React.FC<SalaryPaymentDialogProps> = ({
   open, 
   onOpenChange,
   selectedMonth,
-  selectedYear
+  selectedYear,
+  selectedStaffId
 }) => {
   const { toast } = useToast();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      staffId: '',
+      staffId: selectedStaffId || '',
       amount: 0,
       date: new Date(),
       month: selectedMonth,
@@ -112,6 +114,22 @@ const SalaryPaymentDialog: React.FC<SalaryPaymentDialogProps> = ({
       bonuses: 0,
     },
   });
+  
+  // Update form when selectedStaffId changes or dialog opens
+  useEffect(() => {
+    if (open) {
+      // Set staff ID and pre-fill salary amount if staff is selected
+      if (selectedStaffId) {
+        form.setValue('staffId', selectedStaffId);
+        const salary = getStaffSalary(selectedStaffId);
+        form.setValue('amount', salary);
+      }
+      
+      // Always update month and year to match current selection
+      form.setValue('month', selectedMonth);
+      form.setValue('year', parseInt(selectedYear));
+    }
+  }, [open, selectedStaffId, selectedMonth, selectedYear, form]);
   
   function onSubmit(values: z.infer<typeof formSchema>) {
     // In a real app, this would save the transaction to a database

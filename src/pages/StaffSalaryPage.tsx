@@ -18,6 +18,7 @@ const StaffSalaryPage = () => {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('All Departments');
+  const [selectedStaffId, setSelectedStaffId] = useState<string | undefined>(undefined);
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -38,6 +39,11 @@ const StaffSalaryPage = () => {
     'Housekeeping'
   ];
 
+  const handleRecordPayment = (staffId?: string) => {
+    setSelectedStaffId(staffId);
+    setIsPaymentDialogOpen(true);
+  };
+
   return (
     <AppLayout title="Staff Salaries">
       <div className="space-y-6">
@@ -51,7 +57,7 @@ const StaffSalaryPage = () => {
           <div className="flex items-center gap-2">
             <Button 
               size="sm" 
-              onClick={() => setIsPaymentDialogOpen(true)}
+              onClick={() => handleRecordPayment()}
               className="flex items-center gap-1"
             >
               <PlusCircle className="h-4 w-4" />
@@ -143,7 +149,7 @@ const StaffSalaryPage = () => {
                   year={selectedYear}
                   searchQuery={searchQuery}
                   departmentFilter={departmentFilter}
-                  onRecordPayment={() => setIsPaymentDialogOpen(true)}
+                  onRecordPayment={handleRecordPayment}
                 />
               </CardContent>
             </Card>
@@ -172,9 +178,15 @@ const StaffSalaryPage = () => {
       {/* Payment Dialog */}
       <SalaryPaymentDialog 
         open={isPaymentDialogOpen} 
-        onOpenChange={setIsPaymentDialogOpen}
+        onOpenChange={(open) => {
+          setIsPaymentDialogOpen(open);
+          if (!open) {
+            setSelectedStaffId(undefined); // Clear selected staff when dialog closes
+          }
+        }}
         selectedMonth={selectedMonth}
         selectedYear={selectedYear}
+        selectedStaffId={selectedStaffId}
       />
     </AppLayout>
   );

@@ -138,68 +138,84 @@ const TeacherInfoPage: React.FC = () => {
 
   return (
     <AppLayout title={`Teacher: ${teacher.name}`}>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+      <div className="space-y-8">
+        {/* Header with backlink and actions */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
-              size="icon" 
+              size="icon"
+              className="rounded-full shadow-sm"
               onClick={() => navigate('/teachers')}
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <h1 className="text-2xl font-semibold tracking-tight">Teacher Profile</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Teacher Profile</h1>
           </div>
           
-          <Button onClick={handleEditTeacher}>
+          <Button 
+            onClick={handleEditTeacher}
+            className="rounded-full shadow-sm transition-all hover:shadow"
+          >
             <Edit className="h-4 w-4 mr-2" />
             Edit Profile
           </Button>
         </div>
         
-        {/* Profile Card */}
-        <div className="grid gap-6 md:grid-cols-4">
-          <Card className="md:col-span-4">
-            <CardContent className="p-6">
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-                <Avatar className="h-24 w-24 border-2 border-primary/20">
+        {/* Profile Hero Section */}
+        <div className="overflow-hidden rounded-xl bg-gradient-to-r from-indigo-50 via-white to-blue-50 shadow-md">
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-col gap-8 sm:flex-row sm:items-center">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 opacity-20 blur-xl"></div>
+                <Avatar className="h-32 w-32 rounded-full border-4 border-white shadow-lg">
                   {teacher.photo ? (
                     <AvatarImage src={teacher.photo} alt={teacher.name} />
                   ) : (
-                    <AvatarFallback className="text-3xl">{getInitials(teacher.name)}</AvatarFallback>
+                    <AvatarFallback className="text-4xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                      {getInitials(teacher.name)}
+                    </AvatarFallback>
                   )}
                 </Avatar>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-3xl font-bold">{teacher.name}</h2>
+                  <div className="flex flex-wrap items-center gap-3 text-muted-foreground mt-1">
+                    <span className="flex items-center gap-1">
+                      <Badge variant="outline" className="bg-blue-50">ID: {teacher.staffId}</Badge>
+                    </span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Briefcase className="h-4 w-4" />
+                      {teacher.role}
+                    </span>
+                  </div>
+                </div>
                 
-                <div className="space-y-2">
-                  <div>
-                    <h2 className="text-2xl font-bold">{teacher.name}</h2>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <span>Staff ID: {teacher.staffId}</span>
-                      <span>•</span>
-                      <span>{teacher.role}</span>
+                <div className="flex flex-wrap gap-2">
+                  <Badge className="bg-blue-500 hover:bg-blue-600">{teacher.department}</Badge>
+                  <Badge variant="outline" className="border-blue-200 bg-blue-50">{teacher.qualification}</Badge>
+                </div>
+                
+                <div className="flex flex-wrap gap-6 pt-1 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-full bg-blue-100 p-1.5">
+                      <Mail className="h-4 w-4 text-blue-700" />
                     </div>
+                    <span>{teacher.email}</span>
                   </div>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">{teacher.department}</Badge>
-                    <Badge variant="outline">{teacher.qualification}</Badge>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-4 pt-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Mail className="h-4 w-4" />
-                      <span>{teacher.email}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-full bg-blue-100 p-1.5">
+                      <Phone className="h-4 w-4 text-blue-700" />
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Phone className="h-4 w-4" />
-                      <span>{teacher.phone}</span>
-                    </div>
+                    <span>{teacher.phone}</span>
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
         
         {/* Tabs for different sections of information */}
@@ -213,86 +229,114 @@ const TeacherInfoPage: React.FC = () => {
           
           {/* Personal Details Tab */}
           <TabsContent value="details" className="mt-6">
-            <Card>
-              <CardHeader>
+            <Card className="overflow-hidden border-0 shadow-md">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 pb-4">
                 <CardTitle>Personal Information</CardTitle>
                 <CardDescription>Detailed information about {teacher.name}</CardDescription>
               </CardHeader>
-              <CardContent className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-4">
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Full Name</span>
-                    <span className="font-medium">{teacher.name}</span>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Gender</span>
-                    <span className="font-medium">{teacher.gender}</span>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Date of Birth</span>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{formatDate(teacher.dob)}</span>
+              <CardContent className="p-6">
+                <div className="grid gap-8 sm:grid-cols-2">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Full Name</h3>
+                      <p className="font-medium">{teacher.name}</p>
+                      <Separator className="mt-2" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Gender</h3>
+                      <p className="font-medium">{teacher.gender}</p>
+                      <Separator className="mt-2" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Date of Birth</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-full bg-blue-100 p-1.5">
+                          <Calendar className="h-4 w-4 text-blue-700" />
+                        </div>
+                        <p className="font-medium">{formatDate(teacher.dob)}</p>
+                      </div>
+                      <Separator className="mt-2" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Email Address</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-full bg-blue-100 p-1.5">
+                          <Mail className="h-4 w-4 text-blue-700" />
+                        </div>
+                        <p className="font-medium">{teacher.email}</p>
+                      </div>
+                      <Separator className="mt-2" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Phone Number</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-full bg-blue-100 p-1.5">
+                          <Phone className="h-4 w-4 text-blue-700" />
+                        </div>
+                        <p className="font-medium">{teacher.phone}</p>
+                      </div>
+                      <Separator className="mt-2" />
                     </div>
                   </div>
                   
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Email Address</span>
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{teacher.email}</span>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Role</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-full bg-blue-100 p-1.5">
+                          <Briefcase className="h-4 w-4 text-blue-700" />
+                        </div>
+                        <p className="font-medium">{teacher.role}</p>
+                      </div>
+                      <Separator className="mt-2" />
                     </div>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Phone Number</span>
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{teacher.phone}</span>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Department</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-full bg-blue-100 p-1.5">
+                          <Building className="h-4 w-4 text-blue-700" />
+                        </div>
+                        <p className="font-medium">{teacher.department}</p>
+                      </div>
+                      <Separator className="mt-2" />
                     </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Role</span>
-                    <div className="flex items-center gap-2">
-                      <Briefcase className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{teacher.role}</span>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Qualification</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-full bg-blue-100 p-1.5">
+                          <Award className="h-4 w-4 text-blue-700" />
+                        </div>
+                        <p className="font-medium">{teacher.qualification}</p>
+                      </div>
+                      <Separator className="mt-2" />
                     </div>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Department</span>
-                    <div className="flex items-center gap-2">
-                      <Building className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{teacher.department}</span>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Joining Date</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-full bg-blue-100 p-1.5">
+                          <Calendar className="h-4 w-4 text-blue-700" />
+                        </div>
+                        <p className="font-medium">{formatDate(teacher.joiningDate)}</p>
+                      </div>
+                      <Separator className="mt-2" />
                     </div>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Qualification</span>
-                    <div className="flex items-center gap-2">
-                      <Award className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{teacher.qualification}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Joining Date</span>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{formatDate(teacher.joiningDate)}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Address</span>
-                    <div className="flex items-start gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground mt-1" />
-                      <span className="font-medium">{teacher.address}</span>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Address</h3>
+                      <div className="flex items-start gap-2">
+                        <div className="rounded-full bg-blue-100 p-1.5 mt-0.5">
+                          <MapPin className="h-4 w-4 text-blue-700" />
+                        </div>
+                        <p className="font-medium">{teacher.address}</p>
+                      </div>
+                      <Separator className="mt-2" />
                     </div>
                   </div>
                 </div>
@@ -302,57 +346,63 @@ const TeacherInfoPage: React.FC = () => {
           
           {/* Subjects & Classes Tab */}
           <TabsContent value="subjects" className="mt-6">
-            <Card>
-              <CardHeader>
+            <Card className="overflow-hidden border-0 shadow-md">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 pb-4">
                 <CardTitle>Assigned Subjects & Classes</CardTitle>
                 <CardDescription>Subjects and classes taught by {teacher.name}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Subject</TableHead>
-                      <TableHead>Class</TableHead>
-                      <TableHead>Section</TableHead>
-                      <TableHead>Students</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {teacher.subjects.map((subj, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            <BookOpen className="h-4 w-4 text-muted-foreground" />
-                            {subj.subject}
-                          </div>
-                        </TableCell>
-                        <TableCell>{subj.class}</TableCell>
-                        <TableCell>{subj.section}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                            <span>{Math.floor(Math.random() * 20) + 25}</span> {/* Mock data */}
-                          </div>
-                        </TableCell>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader className="bg-gray-50">
+                      <TableRow>
+                        <TableHead>Subject</TableHead>
+                        <TableHead>Class</TableHead>
+                        <TableHead>Section</TableHead>
+                        <TableHead>Students</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {teacher.subjects.map((subj, idx) => (
+                        <TableRow key={idx} className="hover:bg-gray-50">
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <div className="rounded-full bg-purple-100 p-1.5">
+                                <BookOpen className="h-4 w-4 text-purple-700" />
+                              </div>
+                              {subj.subject}
+                            </div>
+                          </TableCell>
+                          <TableCell>{subj.class}</TableCell>
+                          <TableCell>{subj.section}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="rounded-full bg-purple-100 p-1.5">
+                                <Users className="h-4 w-4 text-purple-700" />
+                              </div>
+                              <span>{Math.floor(Math.random() * 20) + 25}</span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
           
           {/* Weekly Schedule Tab */}
           <TabsContent value="schedule" className="mt-6">
-            <Card>
-              <CardHeader>
+            <Card className="overflow-hidden border-0 shadow-md">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 pb-4">
                 <CardTitle>Weekly Availability Schedule</CardTitle>
                 <CardDescription>Regular teaching hours for {teacher.name}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="border rounded-md overflow-hidden">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
                   <Table>
-                    <TableHeader>
+                    <TableHeader className="bg-gray-50">
                       <TableRow>
                         <TableHead className="w-[150px]">Day</TableHead>
                         <TableHead>Status</TableHead>
@@ -361,17 +411,17 @@ const TeacherInfoPage: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                       {weekDays.map((day) => (
-                        <TableRow key={day.id}>
+                        <TableRow key={day.id} className="hover:bg-gray-50">
                           <TableCell className="font-medium">
                             {day.label}
                           </TableCell>
                           <TableCell>
                             {teacher.availability[day.id as keyof typeof teacher.availability].available ? (
-                              <Badge variant="success" className="bg-green-100 text-green-800 hover:bg-green-100">
+                              <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
                                 Available
                               </Badge>
                             ) : (
-                              <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100">
+                              <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-200">
                                 Not Available
                               </Badge>
                             )}
@@ -379,7 +429,9 @@ const TeacherInfoPage: React.FC = () => {
                           <TableCell>
                             {teacher.availability[day.id as keyof typeof teacher.availability].available ? (
                               <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <div className="rounded-full bg-green-100 p-1.5">
+                                  <Clock className="h-4 w-4 text-green-700" />
+                                </div>
                                 <span>
                                   {teacher.availability[day.id as keyof typeof teacher.availability].from} - {teacher.availability[day.id as keyof typeof teacher.availability].to}
                                 </span>
@@ -399,14 +451,21 @@ const TeacherInfoPage: React.FC = () => {
           
           {/* Performance Tab */}
           <TabsContent value="performance" className="mt-6">
-            <Card>
-              <CardHeader>
+            <Card className="overflow-hidden border-0 shadow-md">
+              <CardHeader className="bg-gradient-to-r from-amber-50 to-orange-50 pb-4">
                 <CardTitle>Performance Overview</CardTitle>
                 <CardDescription>Teaching performance metrics and evaluations</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">Performance data will be available after the next evaluation cycle</p>
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="rounded-full bg-amber-100 p-4 mb-4">
+                    <Award className="h-8 w-8 text-amber-600" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">Performance Data Coming Soon</h3>
+                  <p className="text-muted-foreground max-w-md">
+                    Performance data will be available after the next evaluation cycle. 
+                    Check back later for detailed metrics and analysis.
+                  </p>
                 </div>
               </CardContent>
             </Card>

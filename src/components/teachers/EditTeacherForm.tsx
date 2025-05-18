@@ -88,6 +88,7 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({ teacher, onSubmit, on
   const defaultValues: Partial<TeacherFormValues> = {
     name: teacher.name,
     employeeId: teacher.staffId,
+    staffType: 'teacher', // Since this is a teacher form
     department: teacher.department,
     role: teacher.role,
     qualification: teacher.qualification,
@@ -386,144 +387,150 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({ teacher, onSubmit, on
           </CardContent>
         </Card>
         
-        {/* Subjects & Classes */}
+        {/* Subjects and Classes */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader>
             <CardTitle className="text-xl">Subjects & Classes</CardTitle>
-            <Button type="button" variant="outline" size="sm" onClick={addNewSubject}>
-              <Plus className="h-4 w-4 mr-1" /> Add Subject
-            </Button>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {fields.length === 0 && (
-              <div className="text-center py-4 text-muted-foreground">
-                No subjects assigned. Click "Add Subject" to assign subjects and classes.
-              </div>
-            )}
-            
-            {fields.map((field, index) => (
-              <div key={field.id} className="grid gap-4 md:grid-cols-3 items-end border rounded-md p-4 relative">
-                <FormField
-                  control={form.control}
-                  name={`subjects.${index}.subject`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Subject</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select subject" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {subjects.map((subject) => (
-                            <SelectItem key={subject} value={subject}>
-                              {subject}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name={`subjects.${index}.class`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Class</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select class" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {classes.map((cls) => (
-                            <SelectItem key={cls} value={cls}>
-                              {cls}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name={`subjects.${index}.section`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Section</FormLabel>
-                      <div className="flex items-center space-x-2">
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              {fields.map((field, index) => (
+                <div key={field.id} className="grid gap-4 md:grid-cols-3 items-end border p-4 rounded-md">
+                  <FormField
+                    control={form.control}
+                    name={`subjects.${index}.subject`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subject</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select section" />
+                              <SelectValue placeholder="Select subject" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {sections.map((section) => (
-                              <SelectItem key={section} value={section}>
-                                {section}
+                            {subjects.map((subj) => (
+                              <SelectItem key={subj} value={subj}>
+                                {subj}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          size="icon" 
-                          onClick={() => remove(index)}
-                          className="flex-shrink-0"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            ))}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name={`subjects.${index}.class`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Class</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select class" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {classes.map((cls) => (
+                              <SelectItem key={cls} value={cls}>
+                                {cls}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="flex items-end gap-2">
+                    <FormField
+                      control={form.control}
+                      name={`subjects.${index}.section`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Section</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select section" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {sections.map((sec) => (
+                                <SelectItem key={sec} value={sec}>
+                                  {sec}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => remove(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addNewSubject}
+                className="mt-2"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Subject
+              </Button>
+            </div>
           </CardContent>
         </Card>
         
-        {/* Weekly Schedule */}
+        {/* Weekly Availability */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Weekly Schedule</CardTitle>
+            <CardTitle className="text-xl">Weekly Availability</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {weekDays.map((day) => (
-              <div key={day.id} className="border rounded-md p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium text-lg">{day.label}</h4>
+              <div key={day.id} className="border p-4 rounded-md space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">{day.label}</h4>
+                  
                   <FormField
                     control={form.control}
                     name={`availability.${day.id}.available`}
                     render={({ field }) => (
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <Switch 
-                            checked={field.value} 
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="cursor-pointer">
-                          {field.value ? "Available" : "Not Available"}
-                        </FormLabel>
+                      <FormItem>
+                        <div className="flex items-center space-x-2">
+                          <FormLabel>Available</FormLabel>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
                 
                 {form.watch(`availability.${day.id}.available`) && (
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name={`availability.${day.id}.from`}
@@ -531,11 +538,7 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({ teacher, onSubmit, on
                         <FormItem>
                           <FormLabel>From</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="time" 
-                              {...field} 
-                              value={field.value || "09:00"}
-                            />
+                            <Input type="time" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -549,11 +552,7 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({ teacher, onSubmit, on
                         <FormItem>
                           <FormLabel>To</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="time" 
-                              {...field} 
-                              value={field.value || "15:00"}
-                            />
+                            <Input type="time" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

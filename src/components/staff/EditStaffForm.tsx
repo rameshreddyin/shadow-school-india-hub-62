@@ -45,6 +45,8 @@ interface Staff {
   address?: string;
   dob?: Date;
   joiningDate?: Date;
+  responsibilities?: string;
+  workSchedule?: string;
 }
 
 interface EditStaffFormProps {
@@ -88,8 +90,8 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ staff, onSubmit, onCancel
     defaultValues.role = staff.role;
   } else {
     defaultValues.jobTitle = staff.jobTitle;
-    defaultValues.responsibilities = "Responsibilities not specified";
-    defaultValues.workSchedule = "Regular working hours";
+    defaultValues.responsibilities = staff.responsibilities || "Responsibilities not specified";
+    defaultValues.workSchedule = staff.workSchedule || "Regular working hours";
   }
   
   const form = useForm<StaffFormValues>({

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
@@ -19,6 +20,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import EditTeacherDialog from '@/components/teachers/EditTeacherDialog';
+import { useToast } from '@/hooks/use-toast';
 
 // Mock teacher data (in production would be fetched from API)
 const teachers = [
@@ -101,6 +104,8 @@ const weekDays: Day[] = [
 const TeacherInfoPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   
   // Find teacher data based on ID from params
   const teacher = teachers.find(t => t.id === id);
@@ -128,7 +133,7 @@ const TeacherInfoPage: React.FC = () => {
   };
 
   const handleEditTeacher = () => {
-    navigate(`/teachers/edit/${id}`);
+    setIsEditDialogOpen(true);
   };
 
   return (
@@ -408,6 +413,13 @@ const TeacherInfoPage: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Edit Teacher Dialog */}
+      <EditTeacherDialog 
+        isOpen={isEditDialogOpen} 
+        onClose={() => setIsEditDialogOpen(false)} 
+        teacher={teacher}
+      />
     </AppLayout>
   );
 };

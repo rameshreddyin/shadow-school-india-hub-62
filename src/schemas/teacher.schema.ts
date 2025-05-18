@@ -18,6 +18,23 @@ const availabilitySchema = z.object({
   to: z.string().optional(),
 });
 
+// Salary transaction schema
+export const salaryTransactionSchema = z.object({
+  id: z.string().optional(),
+  staffId: z.string().trim().min(1, "Staff ID is required"),
+  amount: z.number().min(0, "Amount must be a positive number"),
+  date: z.date({
+    required_error: "Transaction date is required",
+  }),
+  month: z.string().trim().min(1, "Month is required"),
+  year: z.number().min(2000, "Year must be valid"),
+  paymentMethod: z.enum(["cash", "bank", "check", "online"]),
+  reference: z.string().optional(),
+  notes: z.string().optional(),
+  deductions: z.number().min(0, "Deductions must be a positive number").optional(),
+  bonuses: z.number().min(0, "Bonuses must be a positive number").optional(),
+});
+
 // Staff type enum
 export const staffTypeEnum = z.enum(['teacher', 'administrative', 'finance', 'housekeeping', 'security', 'other']);
 
@@ -128,3 +145,4 @@ export type NonTeachingStaffFormValues = z.infer<typeof nonTeachingStaffSchema>;
 export type StaffFormValues = z.infer<typeof staffSchema>;
 export type TeacherSubject = z.infer<typeof teacherSubjectSchema>;
 export type StaffType = z.infer<typeof staffTypeEnum>;
+export type SalaryTransaction = z.infer<typeof salaryTransactionSchema>;

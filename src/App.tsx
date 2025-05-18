@@ -30,6 +30,7 @@ const AcademicYearSettingsPage = lazy(() => import("./pages/AcademicYearSettings
 const ClassSectionManagerPage = lazy(() => import("./pages/ClassSectionManagerPage"));
 const CourseSubjectManagerPage = lazy(() => import("./pages/CourseSubjectManagerPage"));
 const AcademicCalendarPage = lazy(() => import("./pages/AcademicCalendarPage"));
+const StaffSalaryPage = lazy(() => import("./pages/StaffSalaryPage"));
 
 // Create query client with better error and retry handling for production
 const queryClient = new QueryClient({
@@ -83,6 +84,13 @@ const App = () => (
                 <ProtectedRoute>
                   <Suspense fallback={<LoadingFallback />}>
                     <TeachersPage />
+                  </Suspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/staff-salaries" element={
+                <ProtectedRoute>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <StaffSalaryPage />
                   </Suspense>
                 </ProtectedRoute>
               } />

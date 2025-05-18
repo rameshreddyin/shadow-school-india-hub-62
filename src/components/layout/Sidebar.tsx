@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { 
   LayoutDashboard, Users, User, CalendarCheck, 
   Calendar, FileText, Bell, Settings, X, Columns, Book,
-  LogOut
+  LogOut, DollarSign
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -32,6 +32,11 @@ const Sidebar: React.FC = () => {
       icon: User, 
       label: 'Teachers', 
       path: '/teachers' 
+    },
+    {
+      icon: DollarSign,
+      label: 'Staff Salaries',
+      path: '/staff-salaries'
     },
     {
       icon: Columns,

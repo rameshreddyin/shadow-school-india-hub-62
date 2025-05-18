@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(null);
           removeToken();
           
-          // Redirect to login if not already there
+          // Redirect to login if not already there and not at the root path
           if (location.pathname !== '/' && !location.pathname.includes('/login')) {
             navigate('/', { replace: true });
           }

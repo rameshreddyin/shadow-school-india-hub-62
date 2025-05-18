@@ -36,17 +36,17 @@ const Sidebar: React.FC = () => {
     {
       icon: DollarSign,
       label: 'Staff Salaries',
-      path: '/staff-salaries'
+      path: '/salary'
     },
-    {
-      icon: Columns,
-      label: 'Class & Section Manager',
-      path: '/class-section-manager'
+    { 
+      icon: Columns, 
+      label: 'Classes', 
+      path: '/classes' 
     },
     {
       icon: Book,
-      label: 'Course & Subject Manager',
-      path: '/course-subject-manager'
+      label: 'Subjects',
+      path: '/settings/subjects'
     },
     { 
       icon: CalendarCheck, 
@@ -91,7 +91,7 @@ const Sidebar: React.FC = () => {
       title: "Logged Out",
       description: "You have been successfully logged out.",
     });
-    navigate('/login');
+    navigate('/');
   };
 
   return (

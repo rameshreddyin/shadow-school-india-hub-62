@@ -42,15 +42,18 @@ const baseStaffSchema = z.object({
   dob: z.date().optional(),
 });
 
-// Teacher specific schema
-export const teacherSchema = baseStaffSchema.extend({
+// Teacher schema without refinement
+const baseTeacherSchema = baseStaffSchema.extend({
   role: z.string().trim().min(1, "Role is required"),
   subjects: z.array(teacherSubjectSchema).optional(),
   availability: z.record(
     z.string(),
     availabilitySchema
   ).optional(),
-}).refine(data => {
+});
+
+// Add refinement separately
+export const teacherSchema = baseTeacherSchema.refine(data => {
   // If staff type is teacher, role is required
   return data.staffType !== 'teacher' || (data.staffType === 'teacher' && data.role);
 }, {
@@ -65,15 +68,31 @@ export const nonTeachingStaffSchema = baseStaffSchema.extend({
   workSchedule: z.string().trim().optional(),
 });
 
+// Create specialized schemas for each staff type
+const teacherStaffSchema = baseTeacherSchema.extend({ 
+  staffType: z.literal('teacher') 
+}).refine(data => {
+  // If staff type is teacher, role is required
+  return data.role && data.role.length > 0;
+}, {
+  message: "Role is required for teachers",
+  path: ["role"],
+});
+
+const administrativeStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('administrative') });
+const financeStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('finance') });
+const housekeepingStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('housekeeping') });
+const securityStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('security') });
+const otherStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('other') });
+
 // Unified schema that conditionally validates based on staff type
 export const staffSchema = z.discriminatedUnion('staffType', [
-  // Use proper type casting for Zod to work with extend
-  teacherSchema.extend({ staffType: z.literal('teacher') }),
-  nonTeachingStaffSchema.extend({ staffType: z.literal('administrative') }),
-  nonTeachingStaffSchema.extend({ staffType: z.literal('finance') }),
-  nonTeachingStaffSchema.extend({ staffType: z.literal('housekeeping') }),
-  nonTeachingStaffSchema.extend({ staffType: z.literal('security') }),
-  nonTeachingStaffSchema.extend({ staffType: z.literal('other') }),
+  teacherStaffSchema,
+  administrativeStaffSchema,
+  financeStaffSchema,
+  housekeepingStaffSchema,
+  securityStaffSchema,
+  otherStaffSchema
 ]);
 
 export type TeacherFormValues = z.infer<typeof teacherSchema>;

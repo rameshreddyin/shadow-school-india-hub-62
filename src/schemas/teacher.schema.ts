@@ -42,8 +42,8 @@ const baseStaffSchema = z.object({
   dob: z.date().optional(),
 });
 
-// Teacher schema without refinement
-const baseTeacherSchema = baseStaffSchema.extend({
+// Teacher schema with fields specific to teachers
+const teacherSchemaBase = baseStaffSchema.extend({
   role: z.string().trim().min(1, "Role is required"),
   subjects: z.array(teacherSubjectSchema).optional(),
   availability: z.record(
@@ -52,8 +52,8 @@ const baseTeacherSchema = baseStaffSchema.extend({
   ).optional(),
 });
 
-// Add refinement separately
-export const teacherSchema = baseTeacherSchema.refine(data => {
+// Teacher schema with refinement for validation
+export const teacherSchema = teacherSchemaBase.refine(data => {
   // If staff type is teacher, role is required
   return data.staffType !== 'teacher' || (data.staffType === 'teacher' && data.role);
 }, {
@@ -68,24 +68,52 @@ export const nonTeachingStaffSchema = baseStaffSchema.extend({
   workSchedule: z.string().trim().optional(),
 });
 
-// Create specialized schemas for each staff type
-const teacherStaffSchema = baseTeacherSchema.extend({ 
-  staffType: z.literal('teacher') 
-}).refine(data => {
-  // If staff type is teacher, role is required
-  return data.role && data.role.length > 0;
-}, {
-  message: "Role is required for teachers",
-  path: ["role"],
+// For the discriminated union, we need to use ZodObject types without refinements
+// Define specific schema objects for each staff type
+const teacherStaffSchema = baseStaffSchema.extend({ 
+  staffType: z.literal('teacher'),
+  role: z.string().trim().min(1, "Role is required"),
+  subjects: z.array(teacherSubjectSchema).optional(),
+  availability: z.record(z.string(), availabilitySchema).optional(),
 });
 
-const administrativeStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('administrative') });
-const financeStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('finance') });
-const housekeepingStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('housekeeping') });
-const securityStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('security') });
-const otherStaffSchema = nonTeachingStaffSchema.extend({ staffType: z.literal('other') });
+const administrativeStaffSchema = baseStaffSchema.extend({ 
+  staffType: z.literal('administrative'),
+  jobTitle: z.string().trim().min(1, "Job title is required"),
+  responsibilities: z.string().trim().min(1, "Responsibilities are required"),
+  workSchedule: z.string().trim().optional(),
+});
+
+const financeStaffSchema = baseStaffSchema.extend({ 
+  staffType: z.literal('finance'),
+  jobTitle: z.string().trim().min(1, "Job title is required"),
+  responsibilities: z.string().trim().min(1, "Responsibilities are required"),
+  workSchedule: z.string().trim().optional(),
+});
+
+const housekeepingStaffSchema = baseStaffSchema.extend({ 
+  staffType: z.literal('housekeeping'),
+  jobTitle: z.string().trim().min(1, "Job title is required"),
+  responsibilities: z.string().trim().min(1, "Responsibilities are required"),
+  workSchedule: z.string().trim().optional(),
+});
+
+const securityStaffSchema = baseStaffSchema.extend({ 
+  staffType: z.literal('security'),
+  jobTitle: z.string().trim().min(1, "Job title is required"),
+  responsibilities: z.string().trim().min(1, "Responsibilities are required"),
+  workSchedule: z.string().trim().optional(),
+});
+
+const otherStaffSchema = baseStaffSchema.extend({ 
+  staffType: z.literal('other'),
+  jobTitle: z.string().trim().min(1, "Job title is required"),
+  responsibilities: z.string().trim().min(1, "Responsibilities are required"),
+  workSchedule: z.string().trim().optional(),
+});
 
 // Unified schema that conditionally validates based on staff type
+// Now using the direct ZodObject types without refinement methods
 export const staffSchema = z.discriminatedUnion('staffType', [
   teacherStaffSchema,
   administrativeStaffSchema,

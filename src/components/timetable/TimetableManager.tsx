@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Card, 
@@ -15,13 +14,14 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Copy, Settings } from 'lucide-react';
+import { AlertTriangle, Copy, Settings, Printer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Link } from 'react-router-dom';
 import TimetableGrid from './TimetableGrid';
 import AddPeriodModal from './AddPeriodModal';
 import CopyTimetableModal from './CopyTimetableModal';
+import PrintableTimetable from './PrintableTimetable';
 import { generateEmptyTimetable } from '@/lib/timetable-utils';
 
 // Types
@@ -45,6 +45,7 @@ const TimetableManager: React.FC = () => {
   // State for modals
   const [addPeriodModalOpen, setAddPeriodModalOpen] = useState(false);
   const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [printModalOpen, setPrintModalOpen] = useState(false);
   const [editingPeriod, setEditingPeriod] = useState<Period | null>(null);
   const [editingCell, setEditingCell] = useState<{day: string, slot: string} | null>(null);
   
@@ -212,6 +213,18 @@ const TimetableManager: React.FC = () => {
     setCopyModalOpen(false);
   };
 
+  const handlePrintTimetable = () => {
+    if (!selectedClass || !selectedSection || !currentTimetable) {
+      toast({
+        title: "Cannot Print",
+        description: "Please select a class and section first.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setPrintModalOpen(true);
+  };
+
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -262,6 +275,14 @@ const TimetableManager: React.FC = () => {
           </div>
           
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 md:ml-auto md:self-end">
+            <Button 
+              variant="outline" 
+              onClick={handlePrintTimetable}
+              disabled={!selectedClass || !selectedSection || !currentTimetable}
+            >
+              <Printer className="h-4 w-4 mr-2" />
+              Print Timetable
+            </Button>
             <Button 
               variant="outline" 
               onClick={() => setCopyModalOpen(true)}
@@ -325,6 +346,15 @@ const TimetableManager: React.FC = () => {
           currentSection={selectedSection}
           availableClasses={mockClasses}
           availableSections={mockSections}
+        />
+      )}
+      
+      {printModalOpen && currentTimetable && (
+        <PrintableTimetable
+          open={printModalOpen}
+          onClose={() => setPrintModalOpen(false)}
+          timetable={currentTimetable}
+          classInfo={{ class: selectedClass, section: selectedSection }}
         />
       )}
     </Card>

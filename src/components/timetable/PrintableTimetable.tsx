@@ -1,0 +1,244 @@
+
+import React, { useRef } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Printer, Download, X } from 'lucide-react';
+import { Timetable, Period } from '@/types/timetable';
+
+interface PrintableTimetableProps {
+  open: boolean;
+  onClose: () => void;
+  timetable: Timetable;
+  classInfo: { class: string; section: string };
+}
+
+const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
+  open,
+  onClose,
+  timetable,
+  classInfo
+}) => {
+  const printRef = useRef<HTMLDivElement>(null);
+  
+  // Generate consistent colors for subjects
+  const subjectColors = new Map<string, string>();
+  const pastelColors = [
+    '#FFE5E5', '#E5F3FF', '#E5FFE5', '#FFF5E5', '#F0E5FF',
+    '#FFE5F0', '#E5FFFF', '#F5FFE5', '#FFE5F5', '#E5F0FF',
+    '#FFFFE5', '#F0FFE5', '#E5FFE8', '#FFF0E5', '#E8E5FF'
+  ];
+  
+  let colorIndex = 0;
+  const getSubjectColor = (subjectName: string): string => {
+    if (!subjectColors.has(subjectName)) {
+      subjectColors.set(subjectName, pastelColors[colorIndex % pastelColors.length]);
+      colorIndex++;
+    }
+    return subjectColors.get(subjectName) || '#F5F5F5';
+  };
+  
+  // Get days and time slots
+  const days = Object.keys(timetable.days);
+  const timeSlotIds = new Set<string>();
+  days.forEach(day => {
+    Object.keys(timetable.days[day].slots).forEach(slotId => {
+      timeSlotIds.add(slotId);
+    });
+  });
+  
+  const timeSlots = Array.from(timeSlotIds).sort((a, b) => {
+    const slotA = a.split('-')[0];
+    const slotB = b.split('-')[0];
+    return parseInt(slotA) - parseInt(slotB);
+  });
+  
+  const getTimeSlotLabel = (slotId: string) => {
+    for (const day of days) {
+      const period = timetable.days[day].slots[slotId];
+      if (period && period.timeSlot) {
+        return `${period.timeSlot.startTime} - ${period.timeSlot.endTime}`;
+      }
+    }
+    const [number] = slotId.split('-');
+    return `Period ${number}`;
+  };
+  
+  const getDayName = (day: string): string => {
+    const dayMap: Record<string, string> = {
+      monday: 'Monday',
+      tuesday: 'Tuesday',
+      wednesday: 'Wednesday',
+      thursday: 'Thursday',
+      friday: 'Friday',
+      saturday: 'Saturday',
+    };
+    return dayMap[day] || day;
+  };
+  
+  const handlePrint = () => {
+    window.print();
+  };
+  
+  const handleDownloadPDF = () => {
+    // For now, we'll use the browser's print to PDF functionality
+    // In a real implementation, you might want to use a library like jsPDF or Puppeteer
+    window.print();
+  };
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Print Timetable - Class {classInfo.class}{classInfo.section}</span>
+              <div className="flex space-x-2">
+                <Button onClick={handlePrint} size="sm">
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print
+                </Button>
+                <Button onClick={handleDownloadPDF} variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download PDF
+                </Button>
+                <Button onClick={onClose} variant="ghost" size="sm">
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div ref={printRef} className="print-container">
+            <div className="timetable-print-view bg-white p-8 font-sans">
+              {/* Header */}
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                  Class {classInfo.class}{classInfo.section} – Weekly Timetable
+                </h1>
+                <div className="h-1 bg-blue-500 w-32 mx-auto rounded"></div>
+              </div>
+              
+              {/* Timetable Grid */}
+              <div className="overflow-hidden rounded-lg border-2 border-gray-300 shadow-lg">
+                <table className="w-full border-collapse">
+                  {/* Header Row */}
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border-2 border-white p-4 text-left font-semibold text-gray-700 bg-gray-200">
+                        Time
+                      </th>
+                      {days.map(day => (
+                        <th 
+                          key={day} 
+                          className="border-2 border-white p-4 text-center font-semibold text-gray-700 bg-gray-200"
+                        >
+                          {getDayName(day)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  
+                  {/* Time Slots */}
+                  <tbody>
+                    {timeSlots.map(slot => (
+                      <tr key={slot}>
+                        <td className="border-2 border-white p-4 font-medium text-gray-600 bg-gray-50 text-sm whitespace-nowrap">
+                          {getTimeSlotLabel(slot)}
+                        </td>
+                        {days.map(day => {
+                          const period = timetable.days[day].slots[slot];
+                          return (
+                            <td 
+                              key={`${day}-${slot}`}
+                              className="border-2 border-white p-4 h-20 align-top"
+                              style={{ 
+                                backgroundColor: period ? getSubjectColor(period.subject.name) : '#F9F9F9'
+                              }}
+                            >
+                              {period ? (
+                                <div className="h-full flex flex-col justify-center">
+                                  <div className="font-semibold text-gray-800 text-sm leading-tight">
+                                    {period.subject.name}
+                                  </div>
+                                  <div className="text-xs text-gray-600 mt-1">
+                                    {period.teacher.name}
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="h-full flex items-center justify-center text-gray-400 text-xs">
+                                  Free Period
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Footer */}
+              <div className="text-center mt-8 pt-4 border-t border-gray-200">
+                <p className="text-sm text-gray-600">
+                  Generated by Akshara School Management System – www.aksharaschools.in
+                </p>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Print Styles */}
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          
+          .timetable-print-view,
+          .timetable-print-view * {
+            visibility: visible;
+          }
+          
+          .timetable-print-view {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            font-family: 'Roboto', 'Arial', sans-serif;
+            background: white !important;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          
+          .timetable-print-view table {
+            page-break-inside: avoid;
+          }
+          
+          .timetable-print-view th,
+          .timetable-print-view td {
+            border: 2px solid white !important;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          
+          @page {
+            size: A4;
+            margin: 0.5in;
+          }
+        }
+        
+        .font-sans {
+          font-family: 'Roboto', 'Arial', sans-serif;
+        }
+      `}</style>
+    </>
+  );
+};
+
+export default PrintableTimetable;

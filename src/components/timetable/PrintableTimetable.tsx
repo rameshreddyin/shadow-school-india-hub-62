@@ -190,7 +190,7 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
       </Dialog>
       
       {/* Print Styles */}
-      <style jsx global>{`
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
         
         @media print {

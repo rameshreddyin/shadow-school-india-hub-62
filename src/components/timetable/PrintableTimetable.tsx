@@ -76,15 +76,23 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
   };
   
   const handlePrint = () => {
+    const printContent = printRef.current;
+    if (!printContent) return;
+    
+    const originalDisplay = printContent.style.display;
+    printContent.style.display = 'block';
+    
     window.print();
+    
+    printContent.style.display = originalDisplay;
   };
   
   const handleDownloadPDF = () => {
-    window.print();
+    handlePrint();
   };
 
   const TimetableContent = () => (
-    <div className="bg-white p-6 min-h-screen">
+    <div className="bg-white p-6">
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">
@@ -213,29 +221,34 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
               visibility: hidden;
             }
             
-            .print-content,
-            .print-content * {
+            [data-radix-portal] {
+              display: none !important;
+            }
+            
+            .print-timetable,
+            .print-timetable * {
               visibility: visible !important;
             }
             
-            .print-content {
+            .print-timetable {
               position: absolute !important;
               left: 0 !important;
               top: 0 !important;
               width: 100% !important;
-              height: 100% !important;
+              height: auto !important;
               background: white !important;
               font-family: Arial, sans-serif !important;
+              display: block !important;
             }
             
-            .print-content table {
+            .print-timetable table {
               border-collapse: collapse !important;
               width: 100% !important;
               page-break-inside: avoid !important;
             }
             
-            .print-content th,
-            .print-content td {
+            .print-timetable th,
+            .print-timetable td {
               border: 2px solid #333 !important;
               padding: 8px !important;
               text-align: left !important;
@@ -245,20 +258,20 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
               print-color-adjust: exact !important;
             }
             
-            .print-content th {
+            .print-timetable th {
               background-color: #E5E7EB !important;
               font-weight: bold !important;
             }
             
-            .print-content .bg-gray-50 {
+            .print-timetable .bg-gray-50 {
               background-color: #F9FAFB !important;
             }
             
-            .print-content .bg-gray-200 {
+            .print-timetable .bg-gray-200 {
               background-color: #E5E7EB !important;
             }
             
-            .print-content h1 {
+            .print-timetable h1 {
               color: #1F2937 !important;
               font-size: 20px !important;
               font-weight: bold !important;
@@ -270,7 +283,7 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
       }} />
       
       {/* Hidden print content */}
-      <div className="print-content" style={{ display: 'none' }}>
+      <div className="print-timetable" style={{ display: 'none' }}>
         <TimetableContent />
       </div>
     </>

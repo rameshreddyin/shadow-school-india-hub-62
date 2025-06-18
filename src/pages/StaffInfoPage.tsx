@@ -157,7 +157,6 @@ const staffMembers = [
   },
 ];
 
-// ... keep existing code (Day interface and weekDays array)
 interface Day {
   id: string;
   label: string;
@@ -408,7 +407,7 @@ const StaffInfoPage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  {!isTeacher && staff.responsibilities && (
+                  {staff.staffType !== 'teacher' && staff.responsibilities && (
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">Responsibilities</span>
                       <span className="font-medium">{staff.responsibilities}</span>

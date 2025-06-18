@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Printer, Download, X } from 'lucide-react';
 import { Timetable, Period } from '@/types/timetable';
@@ -76,19 +76,23 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
   };
   
   const handlePrint = () => {
-    window.print();
+    // Add a slight delay to ensure the content is rendered
+    setTimeout(() => {
+      window.print();
+    }, 100);
   };
   
   const handleDownloadPDF = () => {
     // For now, we'll use the browser's print to PDF functionality
-    // In a real implementation, you might want to use a library like jsPDF or Puppeteer
-    window.print();
+    setTimeout(() => {
+      window.print();
+    }, 100);
   };
 
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto print:hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>Print Timetable - Class {classInfo.class}{classInfo.section}</span>
@@ -106,6 +110,9 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
                 </Button>
               </div>
             </DialogTitle>
+            <DialogDescription>
+              Preview and print the weekly timetable for Class {classInfo.class}{classInfo.section}
+            </DialogDescription>
           </DialogHeader>
           
           <div ref={printRef} className="print-container">
@@ -189,6 +196,86 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
         </DialogContent>
       </Dialog>
       
+      {/* Hidden Print Content - This will be shown when printing */}
+      <div className="hidden print:block print:fixed print:inset-0 print:bg-white print:z-50">
+        <div className="timetable-print-view bg-white p-8 font-sans h-full">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Class {classInfo.class}{classInfo.section} – Weekly Timetable
+            </h1>
+            <div className="h-1 bg-blue-500 w-32 mx-auto rounded"></div>
+          </div>
+          
+          {/* Timetable Grid */}
+          <div className="overflow-hidden rounded-lg border-2 border-gray-300 shadow-lg">
+            <table className="w-full border-collapse">
+              {/* Header Row */}
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border-2 border-white p-4 text-left font-semibold text-gray-700 bg-gray-200">
+                    Time
+                  </th>
+                  {days.map(day => (
+                    <th 
+                      key={day} 
+                      className="border-2 border-white p-4 text-center font-semibold text-gray-700 bg-gray-200"
+                    >
+                      {getDayName(day)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              
+              {/* Time Slots */}
+              <tbody>
+                {timeSlots.map(slot => (
+                  <tr key={slot}>
+                    <td className="border-2 border-white p-4 font-medium text-gray-600 bg-gray-50 text-sm whitespace-nowrap">
+                      {getTimeSlotLabel(slot)}
+                    </td>
+                    {days.map(day => {
+                      const period = timetable.days[day].slots[slot];
+                      return (
+                        <td 
+                          key={`${day}-${slot}`}
+                          className="border-2 border-white p-4 h-20 align-top"
+                          style={{ 
+                            backgroundColor: period ? getSubjectColor(period.subject.name) : '#F9F9F9'
+                          }}
+                        >
+                          {period ? (
+                            <div className="h-full flex flex-col justify-center">
+                              <div className="font-semibold text-gray-800 text-sm leading-tight">
+                                {period.subject.name}
+                              </div>
+                              <div className="text-xs text-gray-600 mt-1">
+                                {period.teacher.name}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="h-full flex items-center justify-center text-gray-400 text-xs">
+                              Free Period
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          {/* Footer */}
+          <div className="text-center mt-8 pt-4 border-t border-gray-200">
+            <p className="text-sm text-gray-600">
+              Generated by Akshara School Management System – www.aksharaschools.in
+            </p>
+          </div>
+        </div>
+      </div>
+      
       {/* Print Styles */}
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -201,21 +288,39 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
               print-color-adjust: exact !important;
             }
             
-            body * {
-              visibility: hidden;
+            @page {
+              size: A4 landscape;
+              margin: 0.5in;
             }
             
-            .timetable-print-view,
-            .timetable-print-view * {
-              visibility: visible !important;
+            .print\\:hidden {
+              display: none !important;
+            }
+            
+            .print\\:block {
+              display: block !important;
+            }
+            
+            .print\\:fixed {
+              position: fixed !important;
+            }
+            
+            .print\\:inset-0 {
+              top: 0 !important;
+              right: 0 !important;
+              bottom: 0 !important;
+              left: 0 !important;
+            }
+            
+            .print\\:bg-white {
+              background-color: white !important;
+            }
+            
+            .print\\:z-50 {
+              z-index: 50 !important;
             }
             
             .timetable-print-view {
-              position: absolute !important;
-              left: 0 !important;
-              top: 0 !important;
-              width: 100% !important;
-              height: 100% !important;
               font-family: 'Roboto', 'Arial', sans-serif !important;
               background: white !important;
               padding: 20px !important;
@@ -264,11 +369,6 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
               width: 128px !important;
               margin: 0 auto !important;
               border-radius: 2px !important;
-            }
-            
-            @page {
-              size: A4 landscape;
-              margin: 0.5in;
             }
           }
           

@@ -408,19 +408,19 @@ const StaffInfoPage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  {!isTeacher && 'responsibilities' in staff && staff.responsibilities && (
+                  {!isTeacher && (staff as any).responsibilities && (
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">Responsibilities</span>
-                      <span className="font-medium">{staff.responsibilities}</span>
+                      <span className="font-medium">{(staff as any).responsibilities}</span>
                     </div>
                   )}
                   
-                  {'workSchedule' in staff && staff.workSchedule && (
+                  {(staff as any).workSchedule && (
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">Work Schedule</span>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{staff.workSchedule}</span>
+                        <span className="font-medium">{(staff as any).workSchedule}</span>
                       </div>
                     </div>
                   )}

@@ -190,53 +190,93 @@ const PrintableTimetable: React.FC<PrintableTimetableProps> = ({
       </Dialog>
       
       {/* Print Styles */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-        
-        @media print {
-          body * {
-            visibility: hidden;
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+          
+          @media print {
+            * {
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            body * {
+              visibility: hidden;
+            }
+            
+            .timetable-print-view,
+            .timetable-print-view * {
+              visibility: visible !important;
+            }
+            
+            .timetable-print-view {
+              position: absolute !important;
+              left: 0 !important;
+              top: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+              font-family: 'Roboto', 'Arial', sans-serif !important;
+              background: white !important;
+              padding: 20px !important;
+              box-sizing: border-box !important;
+            }
+            
+            .timetable-print-view table {
+              width: 100% !important;
+              border-collapse: collapse !important;
+              page-break-inside: avoid !important;
+            }
+            
+            .timetable-print-view th,
+            .timetable-print-view td {
+              border: 2px solid white !important;
+              padding: 8px !important;
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              background-color: inherit !important;
+            }
+            
+            .timetable-print-view th {
+              background-color: #E5E7EB !important;
+              font-weight: 600 !important;
+            }
+            
+            .timetable-print-view .bg-gray-50 {
+              background-color: #F9FAFB !important;
+            }
+            
+            .timetable-print-view .bg-gray-200 {
+              background-color: #E5E7EB !important;
+            }
+            
+            .timetable-print-view h1 {
+              color: #1F2937 !important;
+              font-size: 24px !important;
+              font-weight: bold !important;
+              margin-bottom: 8px !important;
+            }
+            
+            .timetable-print-view .h-1 {
+              height: 4px !important;
+              background-color: #3B82F6 !important;
+              width: 128px !important;
+              margin: 0 auto !important;
+              border-radius: 2px !important;
+            }
+            
+            @page {
+              size: A4 landscape;
+              margin: 0.5in;
+            }
           }
           
-          .timetable-print-view,
-          .timetable-print-view * {
-            visibility: visible;
-          }
-          
-          .timetable-print-view {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
+          .font-sans {
             font-family: 'Roboto', 'Arial', sans-serif;
-            background: white !important;
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-            print-color-adjust: exact;
           }
-          
-          .timetable-print-view table {
-            page-break-inside: avoid;
-          }
-          
-          .timetable-print-view th,
-          .timetable-print-view td {
-            border: 2px solid white !important;
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-            print-color-adjust: exact;
-          }
-          
-          @page {
-            size: A4;
-            margin: 0.5in;
-          }
-        }
-        
-        .font-sans {
-          font-family: 'Roboto', 'Arial', sans-serif;
-        }
-      `}</style>
+        `
+      }} />
     </>
   );
 };

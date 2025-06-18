@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
@@ -407,14 +408,14 @@ const StaffInfoPage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  {staff.staffType !== 'teacher' && staff.responsibilities && (
+                  {!isTeacher && 'responsibilities' in staff && staff.responsibilities && (
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">Responsibilities</span>
                       <span className="font-medium">{staff.responsibilities}</span>
                     </div>
                   )}
                   
-                  {staff.workSchedule && (
+                  {'workSchedule' in staff && staff.workSchedule && (
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">Work Schedule</span>
                       <div className="flex items-center gap-2">

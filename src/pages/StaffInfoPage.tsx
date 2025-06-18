@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
@@ -29,8 +28,9 @@ const staffMembers = [
   {
     id: '1',
     name: 'Dr. Rahul Sharma',
+    employeeId: 'TCH001',
     staffId: 'TCH001',
-    staffType: 'teacher',
+    staffType: 'teacher' as const,
     department: 'Science',
     role: 'Head of Department',
     jobTitle: '',
@@ -39,9 +39,10 @@ const staffMembers = [
     qualification: 'Ph.D. Physics',
     salary: 45000,
     photo: '',
-    gender: 'Male',
+    gender: 'male' as const,
     address: '123 Education Street, Academic Colony, New Delhi',
     dob: new Date('1980-05-15'),
+    joinDate: new Date('2010-06-01'),
     joiningDate: new Date('2010-06-01'),
     responsibilities: 'Teaching Physics, Curriculum development, Lab management',
     workSchedule: 'Monday to Friday, 8:00 AM to 4:00 PM',
@@ -63,8 +64,9 @@ const staffMembers = [
   {
     id: '2',
     name: 'Priya Patel',
+    employeeId: 'TCH002',
     staffId: 'TCH002',
-    staffType: 'teacher',
+    staffType: 'teacher' as const,
     department: 'Mathematics',
     role: 'Senior Teacher',
     jobTitle: '',
@@ -73,9 +75,10 @@ const staffMembers = [
     qualification: 'M.Sc. Mathematics',
     salary: 38000,
     photo: '',
-    gender: 'Female',
+    gender: 'female' as const,
     address: '456 Knowledge Park, Faculty Housing, Mumbai',
     dob: new Date('1985-03-22'),
+    joinDate: new Date('2012-07-15'),
     joiningDate: new Date('2012-07-15'),
     subjects: [
       { subject: 'Mathematics', class: 'Class 9', section: 'A' },
@@ -95,8 +98,9 @@ const staffMembers = [
   {
     id: '3',
     name: 'Anil Kumar',
+    employeeId: 'TCH003',
     staffId: 'TCH003',
-    staffType: 'teacher',
+    staffType: 'teacher' as const,
     department: 'Languages',
     role: 'Teacher',
     jobTitle: '',
@@ -105,16 +109,18 @@ const staffMembers = [
     qualification: 'M.A. English',
     salary: 32000,
     photo: '',
-    gender: 'Male',
+    gender: 'male' as const,
     address: '789 Literature Lane, Faculty Quarters, Bangalore',
     dob: new Date('1982-11-10'),
+    joinDate: new Date('2015-03-20'),
     joiningDate: new Date('2015-03-20'),
   },
   {
     id: '4',
     name: 'Meena Singh',
+    employeeId: 'ADM001',
     staffId: 'ADM001',
-    staffType: 'administrative',
+    staffType: 'administrative' as const,
     department: 'Administration',
     role: '',
     jobTitle: 'Office Manager',
@@ -123,16 +129,18 @@ const staffMembers = [
     qualification: 'B.Com, MBA',
     salary: 35000,
     photo: '',
-    gender: 'Female',
+    gender: 'female' as const,
     address: '45 Court Lane, Mayur Vihar, New Delhi',
     dob: new Date('1983-06-22'),
+    joinDate: new Date('2018-04-12'),
     joiningDate: new Date('2018-04-12'),
   },
   {
     id: '5',
     name: 'Ravi Desai',
+    employeeId: 'FIN001',
     staffId: 'FIN001',
-    staffType: 'finance',
+    staffType: 'finance' as const,
     department: 'Finance',
     role: '',
     jobTitle: 'Accountant',
@@ -141,13 +149,15 @@ const staffMembers = [
     qualification: 'CA',
     salary: 42000,
     photo: '',
-    gender: 'Male',
+    gender: 'male' as const,
     address: '123 Finance Block, Green Park, Mumbai',
     dob: new Date('1985-09-18'),
+    joinDate: new Date('2019-01-15'),
     joiningDate: new Date('2019-01-15'),
   },
 ];
 
+// ... keep existing code (Day interface and weekDays array)
 interface Day {
   id: string;
   label: string;
@@ -306,7 +316,7 @@ const StaffInfoPage: React.FC = () => {
                   
                   <div className="flex flex-col">
                     <span className="text-sm text-muted-foreground">Gender</span>
-                    <span className="font-medium">{staff.gender}</span>
+                    <span className="font-medium capitalize">{staff.gender}</span>
                   </div>
                   
                   <div className="flex flex-col">
